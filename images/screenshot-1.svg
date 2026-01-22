@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 390 844">
+  <defs>
+    <linearGradient id="skyGrad1" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#E0F2FE"/>
+      <stop offset="100%" style="stop-color:#BFDBFE"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="390" height="844" fill="url(#skyGrad1)"/>
+
+  <!-- Status Bar -->
+  <text x="195" y="35" text-anchor="middle" fill="#1E293B" font-family="system-ui" font-size="14" font-weight="600">9:41</text>
+
+  <!-- App Logo centered -->
+  <circle cx="195" cy="300" r="80" fill="#3B82F6"/>
+  <circle cx="195" cy="320" r="40" fill="none" stroke="white" stroke-width="6"/>
+  <circle cx="195" cy="320" r="8" fill="white"/>
+  <circle cx="195" cy="250" r="20" fill="white"/>
+  <g stroke="white" stroke-width="4" stroke-linecap="round">
+    <line x1="195" y1="218" x2="195" y2="208"/>
+    <line x1="163" y1="250" x2="153" y2="250"/>
+    <line x1="227" y1="250" x2="237" y2="250"/>
+  </g>
+
+  <!-- App Name -->
+  <text x="195" y="440" text-anchor="middle" fill="#1E293B" font-family="system-ui" font-size="32" font-weight="800">Ride Call</text>
+  <text x="195" y="475" text-anchor="middle" fill="#64748B" font-family="system-ui" font-size="16">Weather Intelligence for Cyclists</text>
+
+  <!-- Loading indicator -->
+  <circle cx="195" cy="550" r="20" fill="none" stroke="#3B82F6" stroke-width="4" stroke-dasharray="80 40"/>
+
+  <!-- Bottom Nav Indicator -->
+  <rect x="140" y="810" width="110" height="5" rx="2.5" fill="#1E293B"/>
+</svg>

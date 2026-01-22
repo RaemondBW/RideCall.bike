@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 276 556">
+  <defs>
+    <linearGradient id="bgDark1" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e"/>
+      <stop offset="100%" style="stop-color:#16213e"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="276" height="556" fill="url(#bgDark1)"/>
+
+  <!-- Status Bar -->
+  <text x="138" y="28" text-anchor="middle" fill="white" font-family="system-ui" font-size="12" font-weight="600">9:41</text>
+
+  <!-- Header -->
+  <text x="24" y="80" fill="white" font-family="system-ui" font-size="20" font-weight="700">Weather Thresholds</text>
+
+  <!-- Rain Threshold -->
+  <rect x="16" y="100" width="244" height="90" rx="16" fill="rgba(255,255,255,0.08)"/>
+  <text x="32" y="128" fill="rgba(255,255,255,0.6)" font-family="system-ui" font-size="11" font-weight="500">MAX RAIN CHANCE</text>
+  <text x="32" y="160" fill="white" font-family="system-ui" font-size="32" font-weight="700">20%</text>
+  <!-- Slider track -->
+  <rect x="32" y="172" width="212" height="4" rx="2" fill="rgba(255,255,255,0.2)"/>
+  <rect x="32" y="172" width="42" height="4" rx="2" fill="#3B82F6"/>
+  <circle cx="74" cy="174" r="8" fill="white"/>
+
+  <!-- Wind Threshold -->
+  <rect x="16" y="200" width="244" height="90" rx="16" fill="rgba(255,255,255,0.08)"/>
+  <text x="32" y="228" fill="rgba(255,255,255,0.6)" font-family="system-ui" font-size="11" font-weight="500">MAX WIND SPEED</text>
+  <text x="32" y="260" fill="white" font-family="system-ui" font-size="32" font-weight="700">15 mph</text>
+  <!-- Slider track -->
+  <rect x="32" y="272" width="212" height="4" rx="2" fill="rgba(255,255,255,0.2)"/>
+  <rect x="32" y="272" width="106" height="4" rx="2" fill="#3B82F6"/>
+  <circle cx="138" cy="274" r="8" fill="white"/>
+
+  <!-- Temperature Range -->
+  <rect x="16" y="300" width="244" height="90" rx="16" fill="rgba(255,255,255,0.08)"/>
+  <text x="32" y="328" fill="rgba(255,255,255,0.6)" font-family="system-ui" font-size="11" font-weight="500">TEMPERATURE RANGE</text>
+  <text x="32" y="360" fill="white" font-family="system-ui" font-size="32" font-weight="700">45° - 85°F</text>
+  <!-- Dual slider track -->
+  <rect x="32" y="372" width="212" height="4" rx="2" fill="rgba(255,255,255,0.2)"/>
+  <rect x="64" y="372" width="140" height="4" rx="2" fill="#3B82F6"/>
+  <circle cx="64" cy="374" r="8" fill="white"/>
+  <circle cx="204" cy="374" r="8" fill="white"/>
+
+  <!-- Preview Card -->
+  <rect x="16" y="410" width="244" height="100" rx="16" fill="rgba(16,185,129,0.15)"/>
+  <rect x="16" y="410" width="244" height="100" rx="16" fill="none" stroke="#10B981" stroke-width="1"/>
+
+  <text x="32" y="440" fill="#10B981" font-family="system-ui" font-size="12" font-weight="600">TOMORROW PREVIEW</text>
+  <text x="32" y="465" fill="white" font-family="system-ui" font-size="16" font-weight="600">Alarm will ring at 5:30 AM</text>
+  <text x="32" y="488" fill="rgba(255,255,255,0.6)" font-family="system-ui" font-size="12">Rain 5%, Wind 8mph, Temp 62°F</text>
+
+  <!-- Bottom indicator -->
+  <rect x="98" y="530" width="80" height="4" rx="2" fill="rgba(255,255,255,0.3)"/>
+</svg>

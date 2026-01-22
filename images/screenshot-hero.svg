@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 390 844">
+  <defs>
+    <linearGradient id="skyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#E0F2FE"/>
+      <stop offset="100%" style="stop-color:#BFDBFE"/>
+    </linearGradient>
+    <linearGradient id="cardGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3B82F6"/>
+      <stop offset="100%" style="stop-color:#2DD4BF"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="390" height="844" fill="url(#skyGrad)"/>
+
+  <!-- Status Bar Area -->
+  <rect y="0" width="390" height="50" fill="rgba(255,255,255,0.5)"/>
+  <text x="195" y="35" text-anchor="middle" fill="#1E293B" font-family="system-ui" font-size="14" font-weight="600">9:41</text>
+
+  <!-- Location Header -->
+  <text x="24" y="100" fill="#64748B" font-family="system-ui" font-size="14">Current Location</text>
+  <text x="24" y="130" fill="#1E293B" font-family="system-ui" font-size="24" font-weight="700">San Francisco, CA</text>
+
+  <!-- Main Weather Card -->
+  <rect x="24" y="160" width="342" height="200" rx="24" fill="url(#cardGrad)"/>
+
+  <!-- Weather Icon (Sun) -->
+  <circle cx="100" cy="260" r="35" fill="white" opacity="0.9"/>
+  <g stroke="white" stroke-width="4" stroke-linecap="round" opacity="0.9">
+    <line x1="100" y1="210" x2="100" y2="198"/>
+    <line x1="100" y1="322" x2="100" y2="310"/>
+    <line x1="50" y1="260" x2="38" y2="260"/>
+    <line x1="162" y1="260" x2="150" y2="260"/>
+  </g>
+
+  <!-- Temperature -->
+  <text x="180" y="250" fill="white" font-family="system-ui" font-size="64" font-weight="700">72°</text>
+  <text x="180" y="280" fill="rgba(255,255,255,0.9)" font-family="system-ui" font-size="16">Feels like 70°</text>
+
+  <!-- Condition -->
+  <text x="180" y="330" fill="white" font-family="system-ui" font-size="20" font-weight="600">Perfect for riding</text>
+
+  <!-- Stats Row -->
+  <rect x="24" y="380" width="165" height="100" rx="16" fill="white"/>
+  <text x="44" y="420" fill="#64748B" font-family="system-ui" font-size="12">WIND</text>
+  <text x="44" y="455" fill="#1E293B" font-family="system-ui" font-size="28" font-weight="700">8 mph</text>
+  <text x="130" y="455" fill="#64748B" font-family="system-ui" font-size="14">NW</text>
+
+  <rect x="201" y="380" width="165" height="100" rx="16" fill="white"/>
+  <text x="221" y="420" fill="#64748B" font-family="system-ui" font-size="12">HUMIDITY</text>
+  <text x="221" y="455" fill="#1E293B" font-family="system-ui" font-size="28" font-weight="700">45%</text>
+
+  <!-- Hourly Forecast Header -->
+  <text x="24" y="530" fill="#1E293B" font-family="system-ui" font-size="18" font-weight="700">Hourly Forecast</text>
+
+  <!-- Hourly Items -->
+  <g>
+    <rect x="24" y="550" width="70" height="100" rx="12" fill="white"/>
+    <text x="59" y="575" text-anchor="middle" fill="#64748B" font-family="system-ui" font-size="12">Now</text>
+    <circle cx="59" cy="605" r="12" fill="#FCD34D"/>
+    <text x="59" y="640" text-anchor="middle" fill="#1E293B" font-family="system-ui" font-size="16" font-weight="600">72°</text>
+  </g>
+
+  <g>
+    <rect x="102" y="550" width="70" height="100" rx="12" fill="white"/>
+    <text x="137" y="575" text-anchor="middle" fill="#64748B" font-family="system-ui" font-size="12">1PM</text>
+    <circle cx="137" cy="605" r="12" fill="#FCD34D"/>
+    <text x="137" y="640" text-anchor="middle" fill="#1E293B" font-family="system-ui" font-size="16" font-weight="600">74°</text>
+  </g>
+
+  <g>
+    <rect x="180" y="550" width="70" height="100" rx="12" fill="white"/>
+    <text x="215" y="575" text-anchor="middle" fill="#64748B" font-family="system-ui" font-size="12">2PM</text>
+    <circle cx="215" cy="605" r="12" fill="#FCD34D"/>
+    <text x="215" y="640" text-anchor="middle" fill="#1E293B" font-family="system-ui" font-size="16" font-weight="600">75°</text>
+  </g>
+
+  <g>
+    <rect x="258" y="550" width="70" height="100" rx="12" fill="white"/>
+    <text x="293" y="575" text-anchor="middle" fill="#64748B" font-family="system-ui" font-size="12">3PM</text>
+    <circle cx="293" cy="605" r="12" fill="#FCD34D"/>
+    <text x="293" y="640" text-anchor="middle" fill="#1E293B" font-family="system-ui" font-size="16" font-weight="600">73°</text>
+  </g>
+
+  <g>
+    <rect x="336" y="550" width="70" height="100" rx="12" fill="white" opacity="0.5"/>
+    <text x="371" y="575" text-anchor="middle" fill="#64748B" font-family="system-ui" font-size="12">4PM</text>
+    <circle cx="371" cy="605" r="12" fill="#94A3B8"/>
+    <text x="371" y="640" text-anchor="middle" fill="#1E293B" font-family="system-ui" font-size="16" font-weight="600">71°</text>
+  </g>
+
+  <!-- Ride Recommendation -->
+  <rect x="24" y="680" width="342" height="80" rx="16" fill="#10B981"/>
+  <text x="44" y="715" fill="white" font-family="system-ui" font-size="14" font-weight="600">BEST TIME TO RIDE</text>
+  <text x="44" y="742" fill="rgba(255,255,255,0.9)" font-family="system-ui" font-size="16">1PM - 3PM • Low wind, no rain</text>
+
+  <!-- Bottom Nav Indicator -->
+  <rect x="140" y="810" width="110" height="5" rx="2.5" fill="#1E293B"/>
+</svg>

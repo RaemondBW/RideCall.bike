@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 276 556">
+  <defs>
+    <linearGradient id="bgDark4" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e"/>
+      <stop offset="100%" style="stop-color:#16213e"/>
+    </linearGradient>
+    <linearGradient id="notifGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3B82F6"/>
+      <stop offset="100%" style="stop-color:#2DD4BF"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="276" height="556" fill="url(#bgDark4)"/>
+
+  <!-- Status Bar -->
+  <text x="138" y="28" text-anchor="middle" fill="white" font-family="system-ui" font-size="12" font-weight="600">8:45 PM</text>
+
+  <!-- Evening Briefing Header -->
+  <text x="138" y="75" text-anchor="middle" fill="rgba(255,255,255,0.6)" font-family="system-ui" font-size="11" font-weight="500">EVENING BRIEFING</text>
+  <text x="138" y="100" text-anchor="middle" fill="white" font-family="system-ui" font-size="20" font-weight="700">Tomorrow's Ride</text>
+
+  <!-- Main Notification Card -->
+  <rect x="16" y="120" width="244" height="180" rx="20" fill="url(#notifGrad)"/>
+
+  <!-- Bell icon -->
+  <circle cx="50" cy="155" r="20" fill="rgba(255,255,255,0.2)"/>
+  <path d="M50 145 L50 155 L58 163" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="50" cy="145" r="4" fill="white"/>
+
+  <text x="80" y="150" fill="rgba(255,255,255,0.9)" font-family="system-ui" font-size="12">RIDE CALL</text>
+  <text x="80" y="168" fill="white" font-family="system-ui" font-size="14" font-weight="600">Your 5:30 AM alarm is ON</text>
+
+  <line x1="32" y1="190" x2="244" y2="190" stroke="rgba(255,255,255,0.2)"/>
+
+  <!-- Briefing content -->
+  <g transform="translate(32, 205)">
+    <circle cx="12" cy="12" r="12" fill="#FCD34D"/>
+    <text x="35" y="10" fill="rgba(255,255,255,0.8)" font-family="system-ui" font-size="11">Tomorrow 5:30 AM</text>
+    <text x="35" y="28" fill="white" font-family="system-ui" font-size="16" font-weight="700">62°F Clear</text>
+  </g>
+
+  <g transform="translate(32, 250)">
+    <text x="0" y="0" fill="rgba(255,255,255,0.7)" font-family="system-ui" font-size="12">Wind 5mph NW • Rain 0%</text>
+    <text x="0" y="20" fill="rgba(255,255,255,0.7)" font-family="system-ui" font-size="12">Perfect riding conditions</text>
+  </g>
+
+  <!-- Briefing Settings -->
+  <text x="24" y="330" fill="rgba(255,255,255,0.6)" font-family="system-ui" font-size="11" font-weight="500">BRIEFING SETTINGS</text>
+
+  <rect x="16" y="345" width="244" height="55" rx="12" fill="rgba(255,255,255,0.08)"/>
+  <text x="32" y="375" fill="white" font-family="system-ui" font-size="14" font-weight="500">Notification Time</text>
+  <text x="220" y="375" fill="#3B82F6" font-family="system-ui" font-size="14" font-weight="600">8:00 PM</text>
+
+  <rect x="16" y="405" width="244" height="55" rx="12" fill="rgba(255,255,255,0.08)"/>
+  <text x="32" y="435" fill="white" font-family="system-ui" font-size="14" font-weight="500">Include Route Weather</text>
+  <!-- Toggle on -->
+  <rect x="200" y="422" width="44" height="26" rx="13" fill="#10B981"/>
+  <circle cx="231" cy="435" r="10" fill="white"/>
+
+  <rect x="16" y="465" width="244" height="55" rx="12" fill="rgba(255,255,255,0.08)"/>
+  <text x="32" y="495" fill="white" font-family="system-ui" font-size="14" font-weight="500">Sound</text>
+  <text x="220" y="495" fill="rgba(255,255,255,0.5)" font-family="system-ui" font-size="14">Chime</text>
+
+  <!-- Bottom indicator -->
+  <rect x="98" y="530" width="80" height="4" rx="2" fill="rgba(255,255,255,0.3)"/>
+</svg>

@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 390 844">
+  <defs>
+    <linearGradient id="skyGrad3" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#DCFCE7"/>
+      <stop offset="100%" style="stop-color:#BBF7D0"/>
+    </linearGradient>
+    <linearGradient id="successGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#10B981"/>
+      <stop offset="100%" style="stop-color:#34D399"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="390" height="844" fill="url(#skyGrad3)"/>
+
+  <!-- Status Bar -->
+  <text x="195" y="35" text-anchor="middle" fill="#1E293B" font-family="system-ui" font-size="14" font-weight="600">1:15 PM</text>
+
+  <!-- Success Card -->
+  <rect x="24" y="100" width="342" height="240" rx="24" fill="url(#successGrad)"/>
+
+  <!-- Checkmark -->
+  <circle cx="195" cy="180" r="50" fill="white" opacity="0.2"/>
+  <circle cx="195" cy="180" r="35" fill="white"/>
+  <path d="M175 180 L190 195 L220 165" fill="none" stroke="#10B981" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <text x="195" y="270" text-anchor="middle" fill="white" font-family="system-ui" font-size="24" font-weight="700">Perfect Conditions!</text>
+  <text x="195" y="300" text-anchor="middle" fill="rgba(255,255,255,0.9)" font-family="system-ui" font-size="16">Enjoy your ride</text>
+
+  <!-- Current Conditions -->
+  <rect x="24" y="360" width="342" height="180" rx="16" fill="white"/>
+
+  <text x="44" y="400" fill="#64748B" font-family="system-ui" font-size="12" font-weight="600">CURRENT CONDITIONS</text>
+
+  <g>
+    <text x="44" y="450" fill="#64748B" font-family="system-ui" font-size="14">Temperature</text>
+    <text x="320" y="450" text-anchor="end" fill="#1E293B" font-family="system-ui" font-size="16" font-weight="600">74°F</text>
+  </g>
+
+  <line x1="44" y1="470" x2="346" y2="470" stroke="#E2E8F0"/>
+
+  <g>
+    <text x="44" y="500" fill="#64748B" font-family="system-ui" font-size="14">Wind</text>
+    <text x="320" y="500" text-anchor="end" fill="#1E293B" font-family="system-ui" font-size="16" font-weight="600">6 mph NW</text>
+  </g>
+
+  <line x1="44" y1="520" x2="346" y2="520" stroke="#E2E8F0"/>
+
+  <g>
+    <text x="44" y="550" fill="#64748B" font-family="system-ui" font-size="14">Humidity</text>
+    <text x="320" y="550" text-anchor="end" fill="#1E293B" font-family="system-ui" font-size="16" font-weight="600">45%</text>
+  </g>
+
+  <!-- Ride Duration Estimate -->
+  <rect x="24" y="560" width="342" height="100" rx="16" fill="white"/>
+  <text x="44" y="600" fill="#64748B" font-family="system-ui" font-size="12" font-weight="600">RIDING WINDOW</text>
+  <text x="44" y="640" fill="#1E293B" font-family="system-ui" font-size="20" font-weight="700">2 hours remaining</text>
+  <text x="280" y="640" fill="#10B981" font-family="system-ui" font-size="14" font-weight="600">Until 3 PM</text>
+
+  <!-- Tip Card -->
+  <rect x="24" y="680" width="342" height="80" rx="16" fill="#FEF3C7"/>
+  <text x="54" y="715" fill="#92400E" font-family="system-ui" font-size="14" font-weight="600">💡 Pro Tip</text>
+  <text x="54" y="742" fill="#78350F" font-family="system-ui" font-size="14">Headwind on your return if heading NW</text>
+
+  <!-- Bottom Nav Indicator -->
+  <rect x="140" y="810" width="110" height="5" rx="2.5" fill="#1E293B"/>
+</svg>

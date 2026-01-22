@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 276 556">
+  <defs>
+    <linearGradient id="bgDark3" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e"/>
+      <stop offset="100%" style="stop-color:#16213e"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="276" height="556" fill="url(#bgDark3)"/>
+
+  <!-- Status Bar -->
+  <text x="138" y="28" text-anchor="middle" fill="white" font-family="system-ui" font-size="12" font-weight="600">9:41</text>
+
+  <!-- Header -->
+  <text x="24" y="75" fill="white" font-family="system-ui" font-size="20" font-weight="700">9-Day Planner</text>
+
+  <!-- Day tabs -->
+  <g transform="translate(16, 90)">
+    <rect x="0" y="0" width="36" height="50" rx="8" fill="#3B82F6"/>
+    <text x="18" y="20" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-family="system-ui" font-size="10">Mon</text>
+    <text x="18" y="38" text-anchor="middle" fill="white" font-family="system-ui" font-size="14" font-weight="700">12</text>
+
+    <rect x="42" y="0" width="36" height="50" rx="8" fill="rgba(255,255,255,0.08)"/>
+    <text x="60" y="20" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-family="system-ui" font-size="10">Tue</text>
+    <text x="60" y="38" text-anchor="middle" fill="white" font-family="system-ui" font-size="14" font-weight="700">13</text>
+
+    <rect x="84" y="0" width="36" height="50" rx="8" fill="rgba(255,255,255,0.08)"/>
+    <text x="102" y="20" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-family="system-ui" font-size="10">Wed</text>
+    <text x="102" y="38" text-anchor="middle" fill="white" font-family="system-ui" font-size="14" font-weight="700">14</text>
+
+    <rect x="126" y="0" width="36" height="50" rx="8" fill="rgba(16,185,129,0.3)"/>
+    <text x="144" y="20" text-anchor="middle" fill="#10B981" font-family="system-ui" font-size="10">Thu</text>
+    <text x="144" y="38" text-anchor="middle" fill="white" font-family="system-ui" font-size="14" font-weight="700">15</text>
+
+    <rect x="168" y="0" width="36" height="50" rx="8" fill="rgba(255,255,255,0.08)"/>
+    <text x="186" y="20" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-family="system-ui" font-size="10">Fri</text>
+    <text x="186" y="38" text-anchor="middle" fill="white" font-family="system-ui" font-size="14" font-weight="700">16</text>
+
+    <rect x="210" y="0" width="36" height="50" rx="8" fill="rgba(239,68,68,0.3)"/>
+    <text x="228" y="20" text-anchor="middle" fill="#EF4444" font-family="system-ui" font-size="10">Sat</text>
+    <text x="228" y="38" text-anchor="middle" fill="white" font-family="system-ui" font-size="14" font-weight="700">17</text>
+  </g>
+
+  <!-- Hourly Timeline -->
+  <text x="24" y="170" fill="rgba(255,255,255,0.6)" font-family="system-ui" font-size="11" font-weight="500">MONDAY, JAN 12</text>
+
+  <!-- Timeline visualization -->
+  <rect x="16" y="185" width="244" height="120" rx="12" fill="rgba(255,255,255,0.05)"/>
+
+  <!-- Hour labels -->
+  <text x="30" y="205" fill="rgba(255,255,255,0.4)" font-family="system-ui" font-size="9">5AM</text>
+  <text x="75" y="205" fill="rgba(255,255,255,0.4)" font-family="system-ui" font-size="9">8AM</text>
+  <text x="120" y="205" fill="rgba(255,255,255,0.4)" font-family="system-ui" font-size="9">12PM</text>
+  <text x="168" y="205" fill="rgba(255,255,255,0.4)" font-family="system-ui" font-size="9">4PM</text>
+  <text x="215" y="205" fill="rgba(255,255,255,0.4)" font-family="system-ui" font-size="9">8PM</text>
+
+  <!-- Temperature bars -->
+  <rect x="30" y="220" width="20" height="40" rx="4" fill="#3B82F6" opacity="0.6"/>
+  <rect x="55" y="215" width="20" height="50" rx="4" fill="#10B981" opacity="0.8"/>
+  <rect x="80" y="210" width="20" height="55" rx="4" fill="#10B981"/>
+  <rect x="105" y="205" width="20" height="60" rx="4" fill="#10B981"/>
+  <rect x="130" y="210" width="20" height="55" rx="4" fill="#10B981"/>
+  <rect x="155" y="215" width="20" height="50" rx="4" fill="#FCD34D" opacity="0.8"/>
+  <rect x="180" y="225" width="20" height="40" rx="4" fill="#FCD34D" opacity="0.6"/>
+  <rect x="205" y="235" width="20" height="30" rx="4" fill="#3B82F6" opacity="0.5"/>
+  <rect x="230" y="240" width="20" height="25" rx="4" fill="#3B82F6" opacity="0.4"/>
+
+  <!-- Temperature scale -->
+  <text x="30" y="290" fill="rgba(255,255,255,0.5)" font-family="system-ui" font-size="9">54°</text>
+  <text x="105" y="290" fill="rgba(255,255,255,0.5)" font-family="system-ui" font-size="9">72°</text>
+  <text x="205" y="290" fill="rgba(255,255,255,0.5)" font-family="system-ui" font-size="9">58°</text>
+
+  <!-- Best time indicator -->
+  <rect x="75" y="300" width="80" height="6" rx="3" fill="#10B981"/>
+  <text x="115" y="320" text-anchor="middle" fill="#10B981" font-family="system-ui" font-size="10" font-weight="600">Best: 8AM-2PM</text>
+
+  <!-- Conditions summary -->
+  <rect x="16" y="340" width="244" height="85" rx="12" fill="rgba(255,255,255,0.08)"/>
+
+  <g transform="translate(32, 360)">
+    <circle cx="10" cy="10" r="10" fill="#FCD34D"/>
+    <text x="30" y="8" fill="rgba(255,255,255,0.6)" font-family="system-ui" font-size="10">CONDITIONS</text>
+    <text x="30" y="24" fill="white" font-family="system-ui" font-size="14" font-weight="600">Mostly Sunny</text>
+  </g>
+
+  <g transform="translate(32, 395)">
+    <text x="0" y="0" fill="rgba(255,255,255,0.5)" font-family="system-ui" font-size="10">Wind: 5-12mph NW</text>
+    <text x="130" y="0" fill="rgba(255,255,255,0.5)" font-family="system-ui" font-size="10">Rain: 0%</text>
+  </g>
+
+  <!-- Alarm Status -->
+  <rect x="16" y="440" width="244" height="60" rx="12" fill="rgba(16,185,129,0.15)"/>
+  <rect x="16" y="440" width="244" height="60" rx="12" fill="none" stroke="#10B981" stroke-width="1"/>
+  <text x="40" y="468" fill="white" font-family="system-ui" font-size="14" font-weight="600">5:30 AM Alarm</text>
+  <text x="40" y="486" fill="#10B981" font-family="system-ui" font-size="12">Scheduled - Great conditions</text>
+
+  <circle cx="228" cy="470" r="14" fill="#10B981"/>
+  <path d="M220 470 L226 476 L238 464" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Bottom indicator -->
+  <rect x="98" y="530" width="80" height="4" rx="2" fill="rgba(255,255,255,0.3)"/>
+</svg>
