@@ -13,12 +13,15 @@
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
         <link
-            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Pacifico&display=swap"
             rel="stylesheet"
         />
 
         <!-- Styles -->
         <link rel="stylesheet" href="css/styles.css" />
+
+        <!-- Lottie Player -->
+        <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
 
         <!-- Favicon -->
         <link rel="icon" type="image/png" href="images/ride-plan-icon.png" />
@@ -35,70 +38,67 @@
                     />
                     <span>Ride Call</span>
                 </a>
-                <div class="nav-links">
-                    <a href="#features">Features</a>
-                    <a href="#how-it-works">How It Works</a>
-                    <a href="#who-its-for">For You</a>
-                    <a href="#download" class="nav-cta">Download</a>
-                </div>
-                <button class="mobile-menu-btn" aria-label="Toggle menu">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button>
+                <a
+                    href="https://apps.apple.com/us/app/ride-call/id6756632074"
+                    class="nav-cta"
+                    >Download</a
+                >
             </div>
         </nav>
 
         <!-- Hero Section -->
         <section class="hero">
-            <div class="hero-content">
-                <div class="hero-badge animate-fade-in">
-                    <span class="badge-icon">⏰</span>
-                    <span>Wake Up to Ride</span>
-                </div>
-                <h1 class="hero-title animate-fade-in-up">
-                    The smart alarm<br />
-                    <span class="gradient-text">for cyclists</span>
-                </h1>
-                <p class="hero-subtitle animate-fade-in-up delay-1">
-                    Stop gambling with your alarm clock. Ride Call only wakes
-                    you when conditions are actually good for riding.
-                </p>
-                <div class="hero-cta animate-fade-in-up delay-2">
-                    <a
-                        href="https://apps.apple.com/app/ride-call"
-                        class="app-store-btn"
-                    >
-                        <svg
-                            viewBox="0 0 24 24"
-                            fill="currentColor"
-                            class="apple-icon"
-                        >
-                            <path
-                                d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"
-                            />
-                        </svg>
-                        <div class="btn-text">
-                            <span class="btn-label">Download on the</span>
-                            <span class="btn-title">App Store</span>
-                        </div>
-                    </a>
-                </div>
-            </div>
-            <div class="hero-visual animate-fade-in-up delay-2">
-                <div class="phone-mockup hero-phone">
-                    <div class="phone-frame">
-                        <div class="phone-screen">
-                            <img src="images/hero.png" alt="Ride Call App" />
-                        </div>
-                    </div>
-                    <div class="phone-glow"></div>
-                </div>
-            </div>
             <div class="hero-bg">
-                <div class="gradient-orb orb-1"></div>
-                <div class="gradient-orb orb-2"></div>
-                <div class="gradient-orb orb-3"></div>
+                <div class="topo-pattern"></div>
+            </div>
+            <div class="hero-inner">
+                <div class="hero-content">
+                    <div class="hero-badge animate-fade-in">
+                        <span class="badge-icon">⏰</span>
+                        <span>Wake Up to Ride</span>
+                    </div>
+                    <h1 class="hero-title animate-fade-in-up">
+                        The smart alarm<br />
+                        <span class="gradient-text">for cyclists</span>
+                    </h1>
+                    <p class="hero-subtitle animate-fade-in-up delay-1">
+                        Stop gambling with your alarm clock. Ride Call only
+                        wakes you when conditions are actually good for riding.
+                    </p>
+                    <div class="hero-cta animate-fade-in-up delay-2">
+                        <a
+                            href="https://apps.apple.com/us/app/ride-call/id6756632074"
+                            class="app-store-btn"
+                        >
+                            <svg
+                                viewBox="0 0 24 24"
+                                fill="currentColor"
+                                class="apple-icon"
+                            >
+                                <path
+                                    d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"
+                                />
+                            </svg>
+                            <div class="btn-text">
+                                <span class="btn-label">Download on the</span>
+                                <span class="btn-title">App Store</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                <div class="hero-visual animate-fade-in-up delay-2">
+                    <div class="phone-mockup hero-phone">
+                        <div class="phone-frame">
+                            <div class="phone-screen">
+                                <img
+                                    src="images/hero.png"
+                                    alt="Ride Call App"
+                                />
+                            </div>
+                        </div>
+                        <div class="phone-glow"></div>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -132,34 +132,44 @@
                                 <div
                                     class="phone-screen-content screen-1 active"
                                 >
-                                    <img
-                                        src="images/weather-alarms.png"
-                                        alt="Weather-Aware Alarms"
-                                    />
+                                    <lottie-player
+                                        id="lottie-alarm"
+                                        src="images/alarm-conditions.json"
+                                        background="transparent"
+                                        speed="1"
+                                        style="width: 100%; height: 100%"
+                                        mode="normal"
+                                    ></lottie-player>
                                 </div>
                                 <div class="phone-screen-content screen-2">
-                                    <img
-                                        src="images/IMG_1910.PNG"
-                                        alt="Route-Aware Forecasts"
-                                    />
+                                    <lottie-player
+                                        id="lottie-ride"
+                                        src="images/ride-preview.json"
+                                        background="transparent"
+                                        speed="1"
+                                        style="width: 100%; height: 100%"
+                                        mode="normal"
+                                    ></lottie-player>
                                 </div>
                                 <div class="phone-screen-content screen-3">
-                                    <img
-                                        src="images/bad-weather.png"
-                                        alt="Bad Weather Indicator"
-                                    />
+                                    <lottie-player
+                                        id="lottie-9days"
+                                        src="images/9days.json"
+                                        background="transparent"
+                                        speed="1"
+                                        style="width: 100%; height: 100%"
+                                        mode="normal"
+                                    ></lottie-player>
                                 </div>
                                 <div class="phone-screen-content screen-4">
-                                    <img
-                                        src="images/IMG_1936.PNG"
-                                        alt="Evening Briefings"
-                                    />
-                                </div>
-                                <div class="phone-screen-content screen-5">
-                                    <img
-                                        src="images/strava-integration.png"
-                                        alt="Strava Integration"
-                                    />
+                                    <lottie-player
+                                        id="lottie-day"
+                                        src="images/day-preview.json"
+                                        background="transparent"
+                                        speed="1"
+                                        style="width: 100%; height: 100%"
+                                        mode="normal"
+                                    ></lottie-player>
                                 </div>
                             </div>
                         </div>
@@ -171,6 +181,16 @@
                 <div class="feature-cards-container">
                     <div class="feature-card-scroll" data-screen="1">
                         <div class="feature-card-content">
+                            <div class="mobile-slide-phone">
+                                <lottie-player
+                                    class="mobile-lottie"
+                                    src="images/alarm-conditions.json"
+                                    background="transparent"
+                                    speed="1"
+                                    style="width: 100%; height: 100%"
+                                    mode="normal"
+                                ></lottie-player>
+                            </div>
                             <div class="feature-icon-large">
                                 <svg
                                     viewBox="0 0 24 24"
@@ -200,6 +220,16 @@
 
                     <div class="feature-card-scroll" data-screen="2">
                         <div class="feature-card-content">
+                            <div class="mobile-slide-phone">
+                                <lottie-player
+                                    class="mobile-lottie"
+                                    src="images/ride-preview.json"
+                                    background="transparent"
+                                    speed="1"
+                                    style="width: 100%; height: 100%"
+                                    mode="normal"
+                                ></lottie-player>
+                            </div>
                             <div class="feature-icon-large">
                                 <svg
                                     viewBox="0 0 24 24"
@@ -229,6 +259,16 @@
 
                     <div class="feature-card-scroll" data-screen="3">
                         <div class="feature-card-content">
+                            <div class="mobile-slide-phone">
+                                <lottie-player
+                                    class="mobile-lottie"
+                                    src="images/9days.json"
+                                    background="transparent"
+                                    speed="1"
+                                    style="width: 100%; height: 100%"
+                                    mode="normal"
+                                ></lottie-player>
+                            </div>
                             <div class="feature-icon-large">
                                 <svg
                                     viewBox="0 0 24 24"
@@ -265,6 +305,16 @@
 
                     <div class="feature-card-scroll" data-screen="4">
                         <div class="feature-card-content">
+                            <div class="mobile-slide-phone">
+                                <lottie-player
+                                    class="mobile-lottie"
+                                    src="images/day-preview.json"
+                                    background="transparent"
+                                    speed="1"
+                                    style="width: 100%; height: 100%"
+                                    mode="normal"
+                                ></lottie-player>
+                            </div>
                             <div class="feature-icon-large">
                                 <svg
                                     viewBox="0 0 24 24"
@@ -291,252 +341,6 @@
                             </ul>
                         </div>
                     </div>
-
-                    <div class="feature-card-scroll" data-screen="5">
-                        <div class="feature-card-content">
-                            <div class="feature-icon-large">
-                                <svg viewBox="0 0 24 24" fill="currentColor">
-                                    <path
-                                        d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066l-2.084 4.116z"
-                                    />
-                                    <path
-                                        d="M8.613 6.056l2.089 4.116h3.065L8.613 0 3.463 10.172h3.066l2.084-4.116z"
-                                    />
-                                </svg>
-                            </div>
-                            <h3>Strava Integration</h3>
-                            <p>
-                                Import your saved routes and past activities.
-                                Distance, elevation, and duration—all synced
-                                automatically.
-                            </p>
-                            <ul class="feature-list">
-                                <li>Import saved routes</li>
-                                <li>Sync past activities</li>
-                                <li>Distance, elevation, duration</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Interactive Phone Demo Section -->
-        <section id="try-it" class="interactive-demo">
-            <div class="container">
-                <div class="section-header animate-on-scroll">
-                    <span class="section-badge">Try It</span>
-                    <h2 class="section-title">Explore the app</h2>
-                    <p class="section-subtitle">
-                        Scroll and tap to navigate through Ride Call
-                    </p>
-                </div>
-
-                <div class="interactive-phone-container">
-                    <div class="phone-mockup interactive-phone">
-                        <div class="phone-frame">
-                            <div class="phone-screen">
-                                <!-- Scrollable screen content -->
-                                <div
-                                    class="interactive-screen active"
-                                    data-screen="main"
-                                >
-                                    <div class="screen-scroll-area">
-                                        <img
-                                            src="images/interactive/main.JPG"
-                                            alt="Main Screen"
-                                        />
-                                    </div>
-                                    <!-- Tap areas for navigation -->
-                                    <button
-                                        class="tap-area tap-settings"
-                                        data-goto="settings"
-                                        aria-label="Open Settings"
-                                    >
-                                        <span class="tap-hint">Settings</span>
-                                    </button>
-                                    <button
-                                        class="tap-area tap-add"
-                                        data-goto="newride"
-                                        aria-label="Add New Ride"
-                                    >
-                                        <span class="tap-hint">Add Ride</span>
-                                    </button>
-                                </div>
-                                <div
-                                    class="interactive-screen"
-                                    data-screen="settings"
-                                >
-                                    <div class="screen-scroll-area">
-                                        <img
-                                            src="images/interactive/settings.JPG"
-                                            alt="Settings Screen"
-                                        />
-                                    </div>
-                                    <button
-                                        class="tap-area tap-back"
-                                        data-goto="main"
-                                        aria-label="Go Back"
-                                    >
-                                        <span class="tap-hint">Back</span>
-                                    </button>
-                                </div>
-                                <div
-                                    class="interactive-screen"
-                                    data-screen="newride"
-                                >
-                                    <div class="screen-scroll-area">
-                                        <img
-                                            src="images/interactive/newride.JPG"
-                                            alt="New Ride Screen"
-                                        />
-                                    </div>
-                                    <button
-                                        class="tap-area tap-back"
-                                        data-goto="main"
-                                        aria-label="Go Back"
-                                    >
-                                        <span class="tap-hint">Back</span>
-                                    </button>
-                                </div>
-                                <div
-                                    class="interactive-screen"
-                                    data-screen="daydetails"
-                                >
-                                    <div class="screen-scroll-area">
-                                        <img
-                                            src="images/interactive/daydetails.JPG"
-                                            alt="Day Details Screen"
-                                        />
-                                    </div>
-                                    <button
-                                        class="tap-area tap-back"
-                                        data-goto="main"
-                                        aria-label="Go Back"
-                                    >
-                                        <span class="tap-hint">Back</span>
-                                    </button>
-                                </div>
-                                <div
-                                    class="interactive-screen"
-                                    data-screen="ridedetails"
-                                >
-                                    <div class="screen-scroll-area">
-                                        <img
-                                            src="images/interactive/ridedetails.JPG"
-                                            alt="Ride Details Screen"
-                                        />
-                                    </div>
-                                    <button
-                                        class="tap-area tap-back"
-                                        data-goto="main"
-                                        aria-label="Go Back"
-                                    >
-                                        <span class="tap-hint">Back</span>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="phone-glow"></div>
-                    </div>
-
-                    <!-- Navigation hints -->
-                    <div class="interactive-hints">
-                        <p class="hint-text">
-                            <span class="hint-icon">👆</span> Tap highlighted
-                            areas to navigate
-                        </p>
-                        <p class="hint-text">
-                            <span class="hint-icon">📜</span> Scroll inside the
-                            phone to explore
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- How It Works Section -->
-        <section id="how-it-works" class="how-it-works">
-            <div class="container">
-                <div class="section-header animate-on-scroll">
-                    <span class="section-badge">How It Works</span>
-                    <h2 class="section-title">Set it and forget it</h2>
-                    <p class="section-subtitle">
-                        Three simple steps to never miss a good ride again.
-                    </p>
-                </div>
-
-                <div class="steps-horizontal">
-                    <div class="step-h animate-on-scroll">
-                        <div class="step-number-circle">1</div>
-                        <h3>Set your schedule</h3>
-                        <p>
-                            Tell the app when you want to ride—morning commute,
-                            weekend adventures, or training sessions.
-                        </p>
-                    </div>
-
-                    <div class="step-connector"></div>
-
-                    <div class="step-h animate-on-scroll">
-                        <div class="step-number-circle">2</div>
-                        <h3>Define your limits</h3>
-                        <p>
-                            Set your weather thresholds: max rain chance, wind
-                            speed, precipitation intensity.
-                        </p>
-                    </div>
-
-                    <div class="step-connector"></div>
-
-                    <div class="step-h animate-on-scroll">
-                        <div class="step-number-circle">3</div>
-                        <h3>Sleep soundly</h3>
-                        <p>
-                            Ride Call handles the rest—only waking you when
-                            conditions are actually good.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Who It's For Section -->
-        <section id="who-its-for" class="who-section">
-            <div class="container">
-                <div class="section-header animate-on-scroll">
-                    <span class="section-badge">For You</span>
-                    <h2 class="section-title">
-                        Built for every kind of cyclist
-                    </h2>
-                </div>
-
-                <div class="persona-grid">
-                    <div class="persona-card animate-on-scroll">
-                        <div class="persona-emoji">🚴‍♂️</div>
-                        <h3>Commuters</h3>
-                        <p>
-                            Who cycle to work rain-or-shine (but prefer shine)
-                        </p>
-                    </div>
-
-                    <div class="persona-card animate-on-scroll">
-                        <div class="persona-emoji">🌅</div>
-                        <h3>Early Risers</h3>
-                        <p>Who don't want to waste 5am alarms on bad weather</p>
-                    </div>
-
-                    <div class="persona-card animate-on-scroll">
-                        <div class="persona-emoji">🏋️</div>
-                        <h3>Training Athletes</h3>
-                        <p>With structured weekly ride schedules</p>
-                    </div>
-
-                    <div class="persona-card animate-on-scroll">
-                        <div class="persona-emoji">☀️</div>
-                        <h3>Fair-Weather Riders</h3>
-                        <p>Who want to catch every good window</p>
-                    </div>
                 </div>
             </div>
         </section>
@@ -556,7 +360,7 @@
                         Your rides. Your weather. Your call.
                     </p>
                     <a
-                        href="https://apps.apple.com/app/ride-call"
+                        href="https://apps.apple.com/us/app/ride-call/id6756632074"
                         class="app-store-btn large"
                     >
                         <svg
@@ -575,8 +379,7 @@
                     </a>
                 </div>
                 <div class="cta-bg">
-                    <div class="gradient-orb orb-4"></div>
-                    <div class="gradient-orb orb-5"></div>
+                    <div class="topo-pattern"></div>
                 </div>
             </div>
         </section>
@@ -594,9 +397,19 @@
                         <span class="footer-logo">Ride Call</span>
                     </div>
                     <div class="footer-links">
-                        <a href="support.html">Support</a>
-                        <a href="privacy.html">Privacy Policy</a>
-                        <a href="terms.html">Terms of Use</a>
+                        <a
+                            href="https://tally.so/r/kdGRY1"
+                            target="_blank"
+                            rel="noopener"
+                            >Support</a
+                        >
+                        <a href="PrivacyPolicy.html">Privacy Policy</a>
+                        <a
+                            href="https://www.apple.com/legal/internet-services/itunes/dev/stdeula/"
+                            target="_blank"
+                            rel="noopener"
+                            >Terms of Use</a
+                        >
                     </div>
                     <p class="footer-copyright">
                         &copy; 2025 Ride Call. All rights reserved.

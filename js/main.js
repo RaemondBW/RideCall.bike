@@ -75,18 +75,46 @@ function initStickyPhoneFeatures() {
   // Get appropriate root margin based on screen size
   const getRootMargin = () => {
     if (isMobile()) {
-      // On mobile, account for sticky phone height (~335px including padding + navbar)
-      // Trigger when card is just below the phone
-      return "-380px 0px -20% 0px";
+      return "-300px 0px -30% 0px";
     }
-    // Desktop: trigger when card is in middle of viewport
     return "-40% 0px -40% 0px";
   };
 
   let observer;
+  let currentActiveCard = null;
+
+  // Get Lottie players for a card
+  const getLottiePlayers = (card) => {
+    const screenNum = card.getAttribute("data-screen");
+    const desktopLottie = document.querySelector(
+      `.screen-${screenNum} lottie-player`,
+    );
+    const mobileLottie = card.querySelector(".mobile-lottie");
+    return [desktopLottie, mobileLottie].filter(Boolean);
+  };
+
+  // Start Lottie animation from beginning when card comes into focus
+  const startLottieAnimation = (card) => {
+    const players = getLottiePlayers(card);
+    players.forEach((lottie) => {
+      if (lottie && lottie.stop && lottie.play) {
+        lottie.stop();
+        lottie.play();
+      }
+    });
+  };
+
+  // Stop Lottie animation when card loses focus
+  const stopLottieAnimation = (card) => {
+    const players = getLottiePlayers(card);
+    players.forEach((lottie) => {
+      if (lottie && lottie.stop) {
+        lottie.stop();
+      }
+    });
+  };
 
   const createObserver = () => {
-    // Disconnect existing observer if any
     if (observer) {
       observer.disconnect();
     }
@@ -102,9 +130,15 @@ function initStickyPhoneFeatures() {
         if (entry.isIntersecting) {
           const screenNum = entry.target.getAttribute("data-screen");
 
+          // Stop animation on previous card
+          if (currentActiveCard && currentActiveCard !== entry.target) {
+            stopLottieAnimation(currentActiveCard);
+          }
+
           // Update active feature card
           featureCards.forEach((card) => card.classList.remove("active"));
           entry.target.classList.add("active");
+          currentActiveCard = entry.target;
 
           // Update active screen
           screenContents.forEach((screen) => screen.classList.remove("active"));
@@ -112,6 +146,9 @@ function initStickyPhoneFeatures() {
           if (targetScreen) {
             targetScreen.classList.add("active");
           }
+
+          // Start Lottie animation for the new active card
+          startLottieAnimation(entry.target);
         }
       });
     }, observerOptions);
@@ -134,6 +171,21 @@ function initStickyPhoneFeatures() {
   // Set first card as active initially
   if (featureCards.length > 0) {
     featureCards[0].classList.add("active");
+    currentActiveCard = featureCards[0];
+
+    // Start animation when first card becomes visible
+    const visibilityObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            startLottieAnimation(featureCards[0]);
+            visibilityObserver.disconnect();
+          }
+        });
+      },
+      { threshold: 0.1 },
+    );
+    visibilityObserver.observe(featureCards[0]);
   }
 }
 
@@ -213,8 +265,24 @@ window.addEventListener("scroll", () => {
 function initInteractivePhone() {
   const interactiveScreens = document.querySelectorAll(".interactive-screen");
   const tapAreas = document.querySelectorAll(".tap-area");
+  const fixedHeader = document.querySelector(".ios-fixed-header");
+  const headerImg = fixedHeader?.querySelector(".header-img");
+  const scrollAreas = document.querySelectorAll(".screen-scroll-area");
 
   if (interactiveScreens.length === 0) return;
+
+  // Detect scroll to toggle header transparency
+  scrollAreas.forEach((scrollArea) => {
+    scrollArea.addEventListener("scroll", () => {
+      if (fixedHeader) {
+        if (scrollArea.scrollTop > 10) {
+          fixedHeader.classList.add("scrolled");
+        } else {
+          fixedHeader.classList.remove("scrolled");
+        }
+      }
+    });
+  });
 
   // Handle tap area clicks
   tapAreas.forEach((tapArea) => {
@@ -238,6 +306,19 @@ function initInteractivePhone() {
           const scrollArea = newScreen.querySelector(".screen-scroll-area");
           if (scrollArea) {
             scrollArea.scrollTop = 0;
+          }
+
+          // Update fixed header image to match current screen
+          if (headerImg) {
+            const screenImg = newScreen.querySelector("img");
+            if (screenImg) {
+              headerImg.src = screenImg.src;
+            }
+          }
+
+          // Reset header transparency state
+          if (fixedHeader) {
+            fixedHeader.classList.remove("scrolled");
           }
         }
       }

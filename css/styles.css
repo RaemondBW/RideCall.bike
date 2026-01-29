@@ -16,6 +16,7 @@
     --font-family:
         "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
         sans-serif;
+    --font-brand: "Pacifico", cursive;
 
     --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
     --shadow-md:
@@ -119,8 +120,9 @@ button {
     display: flex;
     align-items: center;
     gap: 10px;
-    font-weight: 700;
-    font-size: 1.25rem;
+    font-family: var(--font-brand);
+    font-weight: 400;
+    font-size: 1.5rem;
     color: var(--color-text);
 }
 
@@ -181,11 +183,20 @@ button {
     min-height: 100vh;
     display: flex;
     align-items: center;
+    justify-content: center;
     padding: 120px 24px 80px;
     background: var(--gradient-hero);
     overflow: hidden;
+    width: 100%;
+    gap: 40px;
+}
+
+.hero-inner {
+    display: flex;
+    align-items: center;
     max-width: 1400px;
-    margin: 0 auto;
+    width: 100%;
+    z-index: 2;
 }
 
 .hero-content {
@@ -294,10 +305,10 @@ button {
 
 .phone-glow {
     position: absolute;
-    inset: -20px;
-    background: var(--gradient-primary);
-    filter: blur(60px);
-    opacity: 0.3;
+    inset: -30px;
+    background: linear-gradient(135deg, #264653 0%, #2a9d8f 50%, #e9c46a 100%);
+    filter: blur(50px);
+    opacity: 0.6;
     z-index: -1;
     border-radius: 60px;
 }
@@ -310,53 +321,21 @@ button {
     z-index: 1;
 }
 
-.gradient-orb {
+/* Gradient Background with App Palette */
+.topo-pattern {
     position: absolute;
-    border-radius: 50%;
-    filter: blur(80px);
-    opacity: 0.5;
-    animation: float 20s ease-in-out infinite;
-}
-
-.orb-1 {
-    width: 600px;
-    height: 600px;
-    background: #93c5fd;
-    top: -200px;
-    right: -100px;
-    animation-delay: 0s;
-}
-
-.orb-2 {
-    width: 400px;
-    height: 400px;
-    background: #5eead4;
-    bottom: -100px;
-    left: -100px;
-    animation-delay: -5s;
-}
-
-.orb-3 {
-    width: 300px;
-    height: 300px;
-    background: #fcd34d;
-    top: 50%;
-    right: 20%;
-    opacity: 0.3;
-    animation-delay: -10s;
-}
-
-@keyframes float {
-    0%,
-    100% {
-        transform: translate(0, 0) scale(1);
-    }
-    33% {
-        transform: translate(30px, -30px) scale(1.05);
-    }
-    66% {
-        transform: translate(-20px, 20px) scale(0.95);
-    }
+    inset: 0;
+    opacity: 0.12;
+    background: linear-gradient(
+        135deg,
+        #264653 0%,
+        #287271 15%,
+        #2a9d8f 30%,
+        #8ab17d 50%,
+        #e9c46a 70%,
+        #f4a261 85%,
+        #e76f51 100%
+    );
 }
 
 /* ===== App Store Button ===== */
@@ -479,10 +458,12 @@ button {
     opacity: 1;
 }
 
-.phone-screen-content img {
+.phone-screen-content img,
+.phone-screen-content lottie-player {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    border-radius: inherit;
 }
 
 /* Feature Cards Container */
@@ -514,6 +495,11 @@ button {
     transition: all var(--transition-base);
     opacity: 0.4;
     transform: translateY(20px);
+}
+
+/* Hide mobile phone mockup on desktop */
+.mobile-slide-phone {
+    display: none;
 }
 
 .feature-card-scroll.active .feature-card-content {
@@ -740,11 +726,11 @@ button {
 }
 
 .cta-tagline {
-    font-size: 1.125rem;
-    font-weight: 600;
+    font-family: var(--font-brand);
+    font-size: 1.5rem;
+    font-weight: 400;
     color: var(--color-primary);
     margin-bottom: 40px;
-    font-style: italic;
 }
 
 .cta-bg {
@@ -799,8 +785,9 @@ button {
 }
 
 .footer-logo {
-    font-size: 1.25rem;
-    font-weight: 700;
+    font-family: var(--font-brand);
+    font-size: 1.5rem;
+    font-weight: 400;
 }
 
 .footer-links {
@@ -855,13 +842,55 @@ button {
     background: #000;
 }
 
-.interactive-screen {
-    display: none;
-    width: 100%;
-    height: 100%;
+/* iOS-style fixed header - keeps dynamic island visible */
+.ios-fixed-header {
     position: absolute;
     top: 0;
     left: 0;
+    right: 0;
+    height: 94px; /* Dynamic island + status bar area */
+    z-index: 10;
+    pointer-events: none;
+    border-radius: 36px 36px 0 0;
+    overflow: hidden;
+    background: #000; /* Ensure black background for dynamic island */
+}
+
+/* The image showing top of screenshot - no mask by default */
+.ios-fixed-header img {
+    display: block;
+    width: 100%;
+    height: auto;
+    transition:
+        mask-image 0.2s ease,
+        -webkit-mask-image 0.2s ease;
+}
+
+/* When scrolled, add gradient transparency below the dynamic island */
+.ios-fixed-header.scrolled img {
+    mask-image: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 1) 0%,
+        rgba(0, 0, 0, 1) 50%,
+        rgba(0, 0, 0, 0) 100%
+    );
+    -webkit-mask-image: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 1) 0%,
+        rgba(0, 0, 0, 1) 50%,
+        rgba(0, 0, 0, 0) 100%
+    );
+}
+
+.interactive-screen {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: 5; /* Below the fixed header (z-index: 10) */
 }
 
 .interactive-screen.active {
@@ -869,11 +898,16 @@ button {
 }
 
 .screen-scroll-area {
-    width: 100%;
-    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     overflow-x: hidden;
-    overflow-y: auto;
+    overflow-y: scroll;
     -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    z-index: 1; /* Below the fixed header */
 }
 
 .screen-scroll-area::-webkit-scrollbar {
@@ -881,10 +915,11 @@ button {
     display: none;
 }
 
-.interactive-screen img {
+.screen-scroll-area img {
     display: block;
     width: 100%;
     height: auto;
+    pointer-events: none;
 }
 
 /* Tap Areas */
@@ -1047,116 +1082,102 @@ button {
         flex-direction: column;
     }
 
-    /* Mobile sticky phone - sticks to top while scrolling through features */
+    /* Mobile: Hide the sticky phone completely */
     .sticky-phone-wrapper {
-        position: sticky;
-        top: 72px; /* Below navbar */
-        width: 100%;
-        height: auto;
-        padding: 16px 24px 24px;
-        background: linear-gradient(
-            180deg,
-            var(--color-bg) 0%,
-            var(--color-bg) 85%,
-            transparent 100%
-        );
-        z-index: 10;
-        display: flex;
-        justify-content: center;
+        display: none;
     }
 
-    /* Add subtle fade effect at bottom of sticky phone */
-    .sticky-phone-wrapper::after {
-        content: "";
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        height: 16px;
-        background: linear-gradient(
-            180deg,
-            transparent 0%,
-            rgba(255, 255, 255, 0.8) 100%
-        );
-        pointer-events: none;
-    }
-
-    .sticky-phone .phone-frame {
-        width: 140px;
-        height: 295px;
-        border-radius: 26px;
-        padding: 8px;
-    }
-
-    .sticky-phone .phone-frame::before {
-        width: 50px;
-        height: 16px;
-        top: 10px;
-        border-radius: 10px;
-    }
-
-    .sticky-phone .phone-screen {
-        border-radius: 20px;
-    }
-
-    .sticky-phone .phone-glow {
-        display: none; /* Hide glow on mobile for cleaner look */
-    }
-
+    /* Mobile: Slide deck style - each feature is a full-screen slide */
     .feature-cards-container {
         width: 100%;
-        padding: 20px 24px 60px;
+        padding: 0;
     }
 
     .feature-card-scroll {
-        min-height: auto;
-        padding: 12px 0;
-    }
-
-    .feature-card-scroll:first-child {
-        padding-top: 12px;
+        min-height: calc(100vh - 64px);
+        min-height: calc(100svh - 64px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px 20px;
+        box-sizing: border-box;
     }
 
     .feature-card-content {
-        opacity: 0.6;
-        transform: scale(0.98);
-        padding: 20px;
-        transition: all 0.4s ease;
+        padding: 0;
+        background: none;
+        border: none;
+        box-shadow: none;
+        text-align: center;
+        width: 100%;
+        max-width: 300px;
     }
 
-    .feature-card-scroll.active .feature-card-content {
-        opacity: 1;
-        transform: scale(1);
-        border-color: var(--color-primary);
-        box-shadow: var(--shadow-md);
+    /* Hide the ::before pseudo-element, we'll use real elements */
+    .feature-card-content::before {
+        display: none;
+    }
+
+    /* Phone mockup for mobile slides */
+    .mobile-slide-phone {
+        display: block;
+        width: 160px;
+        height: 340px;
+        margin: 0 auto 24px;
+        padding: 6px;
+        background: linear-gradient(145deg, #2a2a2a 0%, #1a1a1a 100%);
+        border-radius: 24px;
+        box-shadow: var(--shadow-lg);
+        position: relative;
+    }
+
+    .mobile-slide-phone::before {
+        content: "";
+        position: absolute;
+        top: 9px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 40px;
+        height: 12px;
+        background: #000;
+        border-radius: 8px;
+        z-index: 2;
+    }
+
+    .mobile-slide-phone img,
+    .mobile-slide-phone lottie-player {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 18px;
+        overflow: hidden;
     }
 
     .feature-card-content h3 {
-        font-size: 1.125rem;
-        margin-bottom: 10px;
+        font-size: 1.25rem;
+        margin-bottom: 8px;
     }
 
     .feature-card-content p {
-        font-size: 0.9375rem;
+        font-size: 0.875rem;
         margin-bottom: 12px;
         line-height: 1.5;
+        color: var(--color-text-light);
     }
 
     .feature-icon-large {
-        width: 44px;
-        height: 44px;
-        margin-bottom: 12px;
+        display: none;
     }
 
-    .feature-icon-large svg {
-        width: 22px;
-        height: 22px;
+    .feature-list {
+        text-align: left;
+        display: inline-block;
     }
 
     .feature-list li {
-        font-size: 0.875rem;
-        margin-bottom: 6px;
-        padding-left: 24px;
+        font-size: 0.8125rem;
+        margin-bottom: 4px;
+        padding-left: 18px;
     }
 
     .persona-grid {
@@ -1201,6 +1222,11 @@ button {
         flex-direction: column;
         text-align: center;
         padding-top: 100px;
+    }
+
+    .hero-inner {
+        flex-direction: column;
+        text-align: center;
     }
 
     .hero-content {
