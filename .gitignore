@@ -1,0 +1,19 @@
+# macOS
+.DS_Store
+
+# Editor
+*.swp
+*.swo
+*~
+
+# IDE
+.idea/
+.vscode/
+*.sublime-*
+
+# Dependencies
+node_modules/
+
+# Build
+dist/
+build/
