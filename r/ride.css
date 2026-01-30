@@ -1,0 +1,543 @@
+/* ===== Ride Page Styles ===== */
+
+.ride-page {
+    min-height: calc(100vh - 200px);
+    padding: 100px 24px 60px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* ===== State Containers ===== */
+.state-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    text-align: center;
+    gap: 16px;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Loading Spinner */
+.loading-spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid var(--color-border);
+    border-top-color: var(--color-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Error State */
+.error-icon {
+    width: 64px;
+    height: 64px;
+    color: #ef4444;
+}
+
+.error-icon svg {
+    width: 100%;
+    height: 100%;
+}
+
+#error-state h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-text);
+}
+
+#error-state p {
+    color: var(--color-text-light);
+    max-width: 300px;
+}
+
+.btn-secondary {
+    display: inline-block;
+    padding: 12px 24px;
+    background: var(--color-bg-alt);
+    color: var(--color-text);
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    border: 1px solid var(--color-border);
+    transition: all var(--transition-fast);
+    margin-top: 16px;
+}
+
+.btn-secondary:hover {
+    background: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
+}
+
+/* ===== Ride Card ===== */
+.ride-card {
+    background: white;
+    border-radius: var(--radius-xl);
+    padding: 32px;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--color-border);
+    margin-bottom: 24px;
+}
+
+.ride-header {
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.ride-header h1 {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--color-text);
+    margin-bottom: 8px;
+    letter-spacing: -0.02em;
+}
+
+.ride-schedule {
+    display: flex;
+    gap: 8px;
+}
+
+.schedule-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(135deg, #dbeafe 0%, #e0f2fe 100%);
+    color: var(--color-primary);
+    padding: 6px 12px;
+    border-radius: 100px;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.ride-details {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.detail-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.detail-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-bg-alt);
+    border-radius: var(--radius-md);
+    flex-shrink: 0;
+}
+
+.detail-icon svg {
+    width: 24px;
+    height: 24px;
+    color: var(--color-primary);
+}
+
+.detail-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.detail-label {
+    font-size: 0.8125rem;
+    color: var(--color-text-light);
+    font-weight: 500;
+}
+
+.detail-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-text);
+}
+
+/* ===== Route Card ===== */
+.route-card {
+    background: white;
+    border-radius: var(--radius-xl);
+    padding: 24px;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--color-border);
+    margin-bottom: 24px;
+    overflow: hidden;
+}
+
+.section-title-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.section-title-bar h2 {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--color-text);
+}
+
+.route-source {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #fc4c02; /* Strava orange */
+    background: rgba(252, 76, 2, 0.1);
+    padding: 4px 10px;
+    border-radius: 100px;
+}
+
+.route-source.planned {
+    color: var(--color-secondary);
+    background: rgba(16, 185, 129, 0.1);
+}
+
+.route-info {
+    margin-bottom: 16px;
+}
+
+.route-info h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: 12px;
+}
+
+.route-stats {
+    display: flex;
+    gap: 32px;
+}
+
+.stat {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--color-text);
+}
+
+.stat-label {
+    font-size: 0.8125rem;
+    color: var(--color-text-light);
+    font-weight: 500;
+}
+
+.route-map {
+    height: 200px;
+    background: var(--color-bg-alt);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.route-map .mapboxgl-canvas {
+    border-radius: var(--radius-lg);
+}
+
+/* Map placeholder when no polyline */
+.route-map.no-map {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-light);
+    font-size: 0.875rem;
+}
+
+/* ===== Weather Card ===== */
+.weather-card {
+    background: white;
+    border-radius: var(--radius-xl);
+    padding: 24px;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--color-border);
+    margin-bottom: 24px;
+}
+
+.weather-date {
+    font-size: 0.875rem;
+    color: var(--color-text-light);
+    font-weight: 500;
+}
+
+.weather-main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 0;
+    border-bottom: 1px solid var(--color-border);
+    margin-bottom: 20px;
+}
+
+.weather-icon-large {
+    margin-bottom: 12px;
+}
+
+.weather-emoji {
+    font-size: 4rem;
+    line-height: 1;
+}
+
+.weather-temps {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    margin-bottom: 8px;
+}
+
+.temp-high {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--color-text);
+}
+
+.temp-divider {
+    font-size: 1.5rem;
+    color: var(--color-text-light);
+    margin: 0 4px;
+}
+
+.temp-low {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--color-text-light);
+}
+
+.temp-unit {
+    font-size: 1rem;
+    color: var(--color-text-light);
+    margin-left: 2px;
+}
+
+.weather-desc {
+    font-size: 1.125rem;
+    color: var(--color-text);
+    font-weight: 500;
+}
+
+.weather-details {
+    display: flex;
+    justify-content: space-around;
+    gap: 16px;
+}
+
+.weather-detail {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+}
+
+.weather-detail svg {
+    width: 24px;
+    height: 24px;
+    color: var(--color-primary);
+}
+
+.weather-detail span {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.weather-detail-label {
+    font-size: 0.75rem !important;
+    color: var(--color-text-light) !important;
+    font-weight: 500 !important;
+}
+
+.sunrise-sunset {
+    flex-direction: row;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.sun-divider {
+    color: var(--color-text-light) !important;
+}
+
+/* ===== Hourly Weather ===== */
+.hourly-section {
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid var(--color-border);
+}
+
+.hourly-section h3 {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: 16px;
+}
+
+.hourly-chart {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    -webkit-overflow-scrolling: touch;
+}
+
+.hourly-chart::-webkit-scrollbar {
+    height: 4px;
+}
+
+.hourly-chart::-webkit-scrollbar-track {
+    background: var(--color-bg-alt);
+    border-radius: 2px;
+}
+
+.hourly-chart::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    border-radius: 2px;
+}
+
+.hourly-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    min-width: 60px;
+    padding: 12px 8px;
+    background: var(--color-bg-alt);
+    border-radius: var(--radius-md);
+}
+
+.hourly-time {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-text-light);
+}
+
+.hourly-temp {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--color-text);
+}
+
+.hourly-feels {
+    font-size: 0.6875rem;
+    color: var(--color-text-light);
+}
+
+.hourly-precip {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    font-size: 0.75rem;
+    color: var(--color-primary);
+}
+
+.hourly-precip svg {
+    width: 12px;
+    height: 12px;
+}
+
+.hourly-wind {
+    font-size: 0.6875rem;
+    color: var(--color-text-light);
+}
+
+/* ===== App CTA ===== */
+.app-cta {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    border-radius: var(--radius-xl);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    text-align: center;
+}
+
+.app-cta-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.app-cta-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+}
+
+.app-cta-text h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 4px;
+}
+
+.app-cta-text p {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.app-cta .app-store-btn {
+    width: 100%;
+    max-width: 240px;
+    justify-content: center;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 480px) {
+    .ride-page {
+        padding: 88px 16px 40px;
+    }
+
+    .ride-card,
+    .route-card,
+    .weather-card {
+        padding: 20px;
+        border-radius: var(--radius-lg);
+    }
+
+    .ride-header h1 {
+        font-size: 1.5rem;
+    }
+
+    .detail-value {
+        font-size: 1.125rem;
+    }
+
+    .weather-emoji {
+        font-size: 3rem;
+    }
+
+    .temp-high {
+        font-size: 2rem;
+    }
+
+    .temp-low {
+        font-size: 1.25rem;
+    }
+
+    .weather-details {
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .weather-detail {
+        min-width: calc(50% - 6px);
+    }
+}

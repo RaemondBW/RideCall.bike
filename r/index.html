@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Shared Ride - Ride Call</title>
+        <meta
+            name="description"
+            content="View shared ride details from Ride Call - the smart alarm clock for cyclists."
+        />
+
+        <!-- Fonts -->
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Pacifico&display=swap"
+            rel="stylesheet"
+        />
+
+        <!-- Styles -->
+        <link rel="stylesheet" href="../css/styles.css" />
+        <link rel="stylesheet" href="ride.css" />
+
+        <!-- Pako for zlib decompression -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
+
+        <!-- Mapbox GL JS for route display -->
+        <link href="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css" rel="stylesheet" />
+        <script src="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js"></script>
+
+        <!-- Favicon -->
+        <link rel="icon" type="image/png" href="../images/ride-plan-icon.png" />
+    </head>
+    <body>
+        <!-- Navigation -->
+        <nav class="navbar">
+            <div class="nav-container">
+                <a href="../" class="nav-logo">
+                    <img
+                        src="../images/ride-plan-icon.png"
+                        alt="Ride Call"
+                        class="nav-icon"
+                    />
+                    <span>Ride Call</span>
+                </a>
+                <a
+                    href="https://apps.apple.com/us/app/ride-call/id6756632074"
+                    class="nav-cta"
+                    >Download</a
+                >
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="ride-page">
+            <!-- Loading State -->
+            <div id="loading-state" class="state-container">
+                <div class="loading-spinner"></div>
+                <p>Loading ride details...</p>
+            </div>
+
+            <!-- Error State -->
+            <div id="error-state" class="state-container hidden">
+                <div class="error-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="12" y1="8" x2="12" y2="12"/>
+                        <line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
+                </div>
+                <h2>Unable to Load Ride</h2>
+                <p id="error-message">The ride link appears to be invalid or corrupted.</p>
+                <a href="../" class="btn-secondary">Go to Homepage</a>
+            </div>
+
+            <!-- Ride Content -->
+            <div id="ride-content" class="hidden">
+                <!-- Ride Card -->
+                <section class="ride-card">
+                    <div class="ride-header">
+                        <h1 id="ride-title">Morning Ride</h1>
+                        <div class="ride-schedule" id="ride-schedule">
+                            <span class="schedule-badge">Every Monday</span>
+                        </div>
+                    </div>
+
+                    <div class="ride-details">
+                        <div class="detail-item">
+                            <div class="detail-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <path d="M12 6v6l4 2"/>
+                                </svg>
+                            </div>
+                            <div class="detail-content">
+                                <span class="detail-label">Ride Time</span>
+                                <span class="detail-value" id="ride-time">7:30 AM</span>
+                            </div>
+                        </div>
+
+                        <div class="detail-item">
+                            <div class="detail-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 2v20M2 12h20"/>
+                                </svg>
+                            </div>
+                            <div class="detail-content">
+                                <span class="detail-label">Duration</span>
+                                <span class="detail-value" id="ride-duration">1h 30m</span>
+                            </div>
+                        </div>
+
+                        <div class="detail-item">
+                            <div class="detail-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                                    <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                                </svg>
+                            </div>
+                            <div class="detail-content">
+                                <span class="detail-label">Wake Up Time</span>
+                                <span class="detail-value" id="wake-time">6:45 AM</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Route Section -->
+                <section id="route-section" class="route-card hidden">
+                    <div class="section-title-bar">
+                        <h2>Route</h2>
+                        <span class="route-source" id="route-source">Strava Route</span>
+                    </div>
+
+                    <div class="route-info">
+                        <h3 id="route-name">Downtown Loop</h3>
+                        <div class="route-stats">
+                            <div class="stat">
+                                <span class="stat-value" id="route-distance">20 mi</span>
+                                <span class="stat-label">Distance</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-value" id="route-elevation">1,148 ft</span>
+                                <span class="stat-label">Elevation</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="route-map" class="route-map"></div>
+                </section>
+
+                <!-- Weather Section -->
+                <section id="weather-section" class="weather-card hidden">
+                    <div class="section-title-bar">
+                        <h2>Weather</h2>
+                        <span class="weather-date" id="weather-date">Thu, Jan 30</span>
+                    </div>
+
+                    <div class="weather-main">
+                        <div class="weather-icon-large" id="weather-icon">
+                            <span class="weather-emoji"></span>
+                        </div>
+                        <div class="weather-temps">
+                            <span class="temp-high" id="temp-high">65</span>
+                            <span class="temp-divider">/</span>
+                            <span class="temp-low" id="temp-low">52</span>
+                            <span class="temp-unit">°F</span>
+                        </div>
+                        <div class="weather-desc" id="weather-desc">Partly Cloudy</div>
+                    </div>
+
+                    <div class="weather-details">
+                        <div class="weather-detail">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
+                            </svg>
+                            <span id="precip-chance">15%</span>
+                            <span class="weather-detail-label">Rain</span>
+                        </div>
+                        <div class="weather-detail">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/>
+                            </svg>
+                            <span id="wind-speed">12 mph</span>
+                            <span id="wind-dir" class="weather-detail-label">NW</span>
+                        </div>
+                        <div class="weather-detail sunrise-sunset">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M17 18a5 5 0 0 0-10 0"/>
+                                <line x1="12" y1="2" x2="12" y2="9"/>
+                                <line x1="4.22" y1="10.22" x2="5.64" y2="11.64"/>
+                                <line x1="1" y1="18" x2="3" y2="18"/>
+                                <line x1="21" y1="18" x2="23" y2="18"/>
+                                <line x1="18.36" y1="11.64" x2="19.78" y2="10.22"/>
+                            </svg>
+                            <span id="sunrise">7:15</span>
+                            <span class="sun-divider">-</span>
+                            <span id="sunset">5:45</span>
+                        </div>
+                    </div>
+
+                    <!-- Hourly Weather Chart -->
+                    <div id="hourly-section" class="hourly-section hidden">
+                        <h3>During Your Ride</h3>
+                        <div class="hourly-chart" id="hourly-chart"></div>
+                    </div>
+                </section>
+
+                <!-- Open in App CTA -->
+                <section class="app-cta">
+                    <div class="app-cta-content">
+                        <img src="../images/ride-plan-icon.png" alt="Ride Call" class="app-cta-icon" />
+                        <div class="app-cta-text">
+                            <h3>Open in Ride Call</h3>
+                            <p>View full details and add to your rides</p>
+                        </div>
+                    </div>
+                    <a href="https://apps.apple.com/us/app/ride-call/id6756632074" class="app-store-btn" id="open-app-btn">
+                        <svg viewBox="0 0 24 24" fill="currentColor" class="apple-icon">
+                            <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+                        </svg>
+                        <div class="btn-text">
+                            <span class="btn-label">Download on the</span>
+                            <span class="btn-title">App Store</span>
+                        </div>
+                    </a>
+                </section>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="container">
+                <div class="footer-content">
+                    <div class="footer-brand">
+                        <img
+                            src="../images/ride-plan-icon.png"
+                            alt="Ride Call"
+                            class="footer-icon"
+                        />
+                        <span class="footer-logo">Ride Call</span>
+                    </div>
+                    <div class="footer-links">
+                        <a
+                            href="https://tally.so/r/kdGRY1"
+                            target="_blank"
+                            rel="noopener"
+                            >Support</a
+                        >
+                        <a href="../PrivacyPolicy.html">Privacy Policy</a>
+                        <a
+                            href="https://www.apple.com/legal/internet-services/itunes/dev/stdeula/"
+                            target="_blank"
+                            rel="noopener"
+                            >Terms of Use</a
+                        >
+                    </div>
+                    <p class="footer-copyright">
+                        &copy; 2025 Ride Call. All rights reserved.
+                    </p>
+                </div>
+            </div>
+        </footer>
+
+        <!-- Scripts -->
+        <script src="../js/main.js"></script>
+        <script src="ride.js"></script>
+    </body>
+</html>
