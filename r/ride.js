@@ -30,6 +30,22 @@ const DAY_NAMES = {
   7: "Saturday",
 };
 
+// Global state for chart/map sync
+let chartState = {
+  hourlyData: [],
+  rideStartHour: 0,
+  rideEndTime: 0,
+  rideDuration: 0,
+  map: null,
+  routeCoordinates: [],
+  positionMarker: null,
+  // Chart scale info for indicator positioning
+  yMin: 0,
+  yMax: 0,
+  chartHeight: 0,
+  hourWidth: 0,
+};
+
 // ===== Main Initialization =====
 function initRidePage() {
   const urlParams = new URLSearchParams(window.location.search);
@@ -42,6 +58,7 @@ function initRidePage() {
 
   try {
     const rideData = decodeRideData(encodedData);
+    console.log("Decoded ride data:", rideData);
     displayRideData(rideData);
   } catch (error) {
     console.error("Error decoding ride data:", error);
@@ -86,11 +103,16 @@ function displayRideData(data) {
   // Display route if present
   if (data.rt) {
     displayRoute(data.rt);
+  } else {
+    document.getElementById("route-info-row").style.display = "none";
   }
 
-  // Display weather if present
+  // Display weather and chart if present
   if (data.w) {
     displayWeather(data.w, data.r);
+    if (data.w.hr && data.w.hr.length > 0) {
+      displayTemperatureChart(data.w.hr, data.r);
+    }
   }
 
   // Show content, hide loading
@@ -103,18 +125,21 @@ function displayRideInfo(ride) {
   // Title
   document.getElementById("ride-title").textContent = ride.t;
 
-  // Schedule
-  const scheduleEl = document.getElementById("ride-schedule");
-  if (ride.rec) {
-    scheduleEl.innerHTML = `<span class="schedule-badge">Every ${DAY_NAMES[ride.rec]}</span>`;
-  } else if (ride.dt) {
-    const date = parseDate(ride.dt);
-    scheduleEl.innerHTML = `<span class="schedule-badge">${formatDateLong(date)}</span>`;
-  }
-
   // Time
   const rideTime = formatTime(ride.h, ride.m);
   document.getElementById("ride-time").textContent = rideTime;
+
+  // Schedule
+  const scheduleEl = document.getElementById("ride-schedule");
+  const recurrenceIcon = document.getElementById("recurrence-icon");
+  if (ride.rec) {
+    scheduleEl.textContent = DAY_NAMES[ride.rec];
+    recurrenceIcon.style.display = "inline-flex";
+  } else if (ride.dt) {
+    const date = parseDate(ride.dt);
+    scheduleEl.textContent = formatDateShort(date);
+    recurrenceIcon.style.display = "none";
+  }
 
   // Duration
   document.getElementById("ride-duration").textContent = formatDuration(ride.d);
@@ -128,24 +153,25 @@ function displayRideInfo(ride) {
     wakeHour,
     wakeMin,
   );
+  document.getElementById("alarm-time").textContent = formatTime(
+    wakeHour,
+    wakeMin,
+  );
+
+  // Prep + Commute
+  document.getElementById("prep-commute").textContent =
+    `${totalMinutesBefore} min`;
+
+  // Store for chart/map sync
+  chartState.rideStartTime = ride.h + (ride.m || 0) / 60;
+  chartState.rideEndTime = chartState.rideStartTime + ride.d / 60;
+  chartState.rideDuration = ride.d;
 }
 
 // ===== Display Route =====
 function displayRoute(route) {
-  const routeSection = document.getElementById("route-section");
-  routeSection.classList.remove("hidden");
-
   // Route name
   document.getElementById("route-name").textContent = route.n;
-
-  // Source badge
-  const sourceEl = document.getElementById("route-source");
-  if (route.act) {
-    sourceEl.textContent = "Strava Activity";
-  } else {
-    sourceEl.textContent = "Planned Route";
-    sourceEl.classList.add("planned");
-  }
 
   // Distance (convert meters to miles)
   const miles = route.di / 1609.34;
@@ -159,11 +185,8 @@ function displayRoute(route) {
 
   // Map
   if (route.pl) {
+    document.getElementById("map-section").classList.remove("hidden");
     initMap(route.pl);
-  } else {
-    const mapEl = document.getElementById("route-map");
-    mapEl.classList.add("no-map");
-    mapEl.innerHTML = "<span>Route map not available</span>";
   }
 }
 
@@ -171,76 +194,62 @@ function displayRoute(route) {
 function initMap(polyline) {
   // Decode polyline
   const coordinates = decodePolyline(polyline);
+  chartState.routeCoordinates = coordinates;
 
   if (coordinates.length === 0) {
-    const mapEl = document.getElementById("route-map");
-    mapEl.classList.add("no-map");
-    mapEl.innerHTML = "<span>Unable to display route</span>";
+    document.getElementById("map-section").classList.add("hidden");
     return;
   }
 
-  // Check if Mapbox is available
-  if (typeof mapboxgl === "undefined") {
-    const mapEl = document.getElementById("route-map");
-    mapEl.classList.add("no-map");
-    mapEl.innerHTML = "<span>Map loading...</span>";
+  // Check if Leaflet is available
+  if (typeof L === "undefined") {
     return;
   }
 
-  // Use a free/public Mapbox style (no token required for simple display)
-  // For production, you'd want to add your own token
-  mapboxgl.accessToken =
-    "pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw";
-
-  const map = new mapboxgl.Map({
-    container: "route-map",
-    style: "mapbox://styles/mapbox/outdoors-v12",
-    interactive: false,
+  // Create Leaflet map
+  const map = L.map("route-map", {
+    zoomControl: false,
+    attributionControl: false,
+    dragging: false,
+    scrollWheelZoom: false,
+    doubleClickZoom: false,
+    touchZoom: false,
   });
 
-  map.on("load", () => {
-    // Add the route line
-    map.addSource("route", {
-      type: "geojson",
-      data: {
-        type: "Feature",
-        properties: {},
-        geometry: {
-          type: "LineString",
-          coordinates: coordinates.map((coord) => [coord[1], coord[0]]), // [lng, lat]
-        },
-      },
-    });
+  chartState.map = map;
 
-    map.addLayer({
-      id: "route",
-      type: "line",
-      source: "route",
-      layout: {
-        "line-join": "round",
-        "line-cap": "round",
-      },
-      paint: {
-        "line-color": "#3b82f6",
-        "line-width": 4,
-      },
-    });
+  // Use CartoDB dark matter for dark theme
+  L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+    maxZoom: 19,
+  }).addTo(map);
 
-    // Fit map to route bounds
-    const bounds = coordinates.reduce(
-      (bounds, coord) => {
-        return bounds.extend([coord[1], coord[0]]);
-      },
-      new mapboxgl.LngLatBounds(
-        [coordinates[0][1], coordinates[0][0]],
-        [coordinates[0][1], coordinates[0][0]],
-      ),
-    );
+  // Add the route polyline
+  const routeLine = L.polyline(coordinates, {
+    color: "#0a84ff",
+    weight: 4,
+    opacity: 1,
+    lineJoin: "round",
+    lineCap: "round",
+  }).addTo(map);
 
-    map.fitBounds(bounds, {
-      padding: 40,
-    });
+  // Create position marker (hidden initially)
+  const markerIcon = L.divIcon({
+    className: "position-marker",
+    iconSize: [16, 16],
+    iconAnchor: [8, 8],
   });
+  chartState.positionMarker = L.marker([0, 0], {
+    icon: markerIcon,
+    opacity: 0,
+  }).addTo(map);
+
+  // Fit map to route bounds with a slight delay
+  setTimeout(() => {
+    map.invalidateSize();
+    map.fitBounds(routeLine.getBounds(), {
+      padding: [40, 40],
+    });
+  }, 100);
 }
 
 // ===== Decode Google Polyline =====
@@ -295,102 +304,512 @@ function displayWeather(weather, ride) {
     document.getElementById("weather-date").textContent = formatDateShort(date);
   }
 
-  // Weather icon
-  const emoji = SF_SYMBOL_MAP[weather.sym] || "🌤️";
-  document.querySelector(".weather-emoji").textContent = emoji;
+  // Calculate ride time window
+  const rideStartTime = ride.h + (ride.m || 0) / 60;
+  const rideEndTime = rideStartTime + ride.d / 60;
 
-  // Temperatures
-  document.getElementById("temp-high").textContent = weather.hi;
-  document.getElementById("temp-low").textContent = weather.lo;
+  // Filter hourly data to ride window and calculate summary
+  let rideWeather = {
+    temps: [],
+    precip: [],
+    wind: [],
+    symbols: [],
+  };
 
-  // Description
-  document.getElementById("weather-desc").textContent = weather.desc;
-
-  // Precipitation
-  document.getElementById("precip-chance").textContent = `${weather.pr}%`;
-
-  // Wind
-  document.getElementById("wind-speed").textContent = `${weather.ws} mph`;
-  document.getElementById("wind-dir").textContent = weather.wd;
-
-  // Sunrise/Sunset
-  if (weather.sr && weather.ss) {
-    document.getElementById("sunrise").textContent = formatTimeString(
-      weather.sr,
-    );
-    document.getElementById("sunset").textContent = formatTimeString(
-      weather.ss,
-    );
-  } else {
-    document.querySelector(".sunrise-sunset").style.display = "none";
+  if (weather.hr && weather.hr.length > 0) {
+    weather.hr.forEach((h) => {
+      // Include hours that overlap with ride time
+      // An hour overlaps if: hour < rideEndTime AND hour+1 > rideStartTime
+      if (h.h < rideEndTime && h.h + 1 > rideStartTime) {
+        rideWeather.temps.push(h.t);
+        rideWeather.precip.push(h.pc || 0);
+        rideWeather.wind.push(h.w || 0);
+        if (h.sym) rideWeather.symbols.push(h.sym);
+      }
+    });
   }
 
-  // Hourly weather
+  // Use ride-specific data if available, otherwise fall back to daily data
+  if (rideWeather.temps.length > 0) {
+    const minTemp = Math.min(...rideWeather.temps);
+    const maxTemp = Math.max(...rideWeather.temps);
+    const maxPrecip = Math.max(...rideWeather.precip);
+    const avgWind = Math.round(
+      rideWeather.wind.reduce((a, b) => a + b, 0) / rideWeather.wind.length,
+    );
+
+    // Temperature display
+    if (minTemp === maxTemp) {
+      document.getElementById("temp-high").textContent = maxTemp;
+      document.querySelector(".temp-divider").style.display = "none";
+      document.querySelector(".temp-low").style.display = "none";
+    } else {
+      document.getElementById("temp-high").textContent = maxTemp;
+      document.getElementById("temp-low").textContent = minTemp;
+    }
+
+    // Precipitation
+    document.getElementById("precip-chance").textContent = `${maxPrecip}%`;
+
+    // Wind
+    document.getElementById("wind-speed").textContent = avgWind;
+
+    // Use most common symbol from ride hours, or first one
+    if (rideWeather.symbols.length > 0) {
+      const emoji = SF_SYMBOL_MAP[rideWeather.symbols[0]] || "🌤️";
+      document.querySelector(".weather-emoji").textContent = emoji;
+    }
+  } else {
+    // Fall back to daily weather
+    document.getElementById("temp-high").textContent = weather.hi;
+    document.getElementById("temp-low").textContent = weather.lo;
+    document.getElementById("precip-chance").textContent = `${weather.pr}%`;
+    document.getElementById("wind-speed").textContent = weather.ws;
+
+    const emoji = SF_SYMBOL_MAP[weather.sym] || "🌤️";
+    document.querySelector(".weather-emoji").textContent = emoji;
+  }
+
+  // Description (use daily description)
+  document.getElementById("weather-desc").textContent = weather.desc;
+
+  // Wind direction (use daily)
+  document.getElementById("wind-dir").textContent = weather.wd;
+
+  // Sunrise/Sunset - only show if it occurs during the ride
+  const sunDetail = document.getElementById("sun-detail");
+  const sunriseTime = parseTimeToDecimal(weather.sr, true);
+  const sunsetTime = parseTimeToDecimal(weather.ss, false);
+
+  let showSunEvent = false;
+
+  if (sunriseTime >= rideStartTime && sunriseTime <= rideEndTime) {
+    // Sunrise occurs during the ride
+    document.getElementById("sun-time").textContent = weather.sr;
+    document.getElementById("sun-label").textContent = "Sunrise";
+    showSunEvent = true;
+  } else if (sunsetTime >= rideStartTime && sunsetTime <= rideEndTime) {
+    // Sunset occurs during the ride
+    document.getElementById("sun-time").textContent = weather.ss;
+    document.getElementById("sun-label").textContent = "Sunset";
+    showSunEvent = true;
+  }
+
+  if (!showSunEvent) {
+    sunDetail.style.display = "none";
+  }
+
+  // Update map overlay with first ride hour data
   if (weather.hr && weather.hr.length > 0) {
-    displayHourlyWeather(weather.hr, ride);
+    const rideStartHour = Math.floor(rideStartTime);
+    const firstRideHour =
+      weather.hr.find((h) => h.h >= rideStartHour) || weather.hr[0];
+    updateMapOverlay(firstRideHour);
   }
 }
 
-// ===== Display Hourly Weather =====
-function displayHourlyWeather(hourlyData, ride) {
-  const hourlySection = document.getElementById("hourly-section");
-  const hourlyChart = document.getElementById("hourly-chart");
+// ===== Update Map Weather Overlay =====
+function updateMapOverlay(hourData) {
+  document.getElementById("map-temp").textContent = `${hourData.t}°`;
+  document.getElementById("map-feels").textContent = `${hourData.fl}°`;
+  document.getElementById("map-wind").textContent = hourData.w;
+}
 
-  // Filter to show hours relevant to the ride
-  const rideStartHour = ride.h;
-  const rideDurationHours = Math.ceil(ride.d / 60);
-  const rideEndHour = rideStartHour + rideDurationHours;
-
-  // Filter hourly data to ride window (with some buffer)
-  const relevantHours = hourlyData.filter((h) => {
-    return h.h >= rideStartHour - 1 && h.h <= rideEndHour + 1;
-  });
-
-  if (relevantHours.length === 0) {
+// ===== Update Map Position Marker =====
+function updateMapPositionMarker(currentTime) {
+  if (!chartState.positionMarker || chartState.routeCoordinates.length === 0) {
     return;
   }
 
-  hourlySection.classList.remove("hidden");
+  const { rideStartTime, rideEndTime, routeCoordinates, positionMarker } =
+    chartState;
 
-  hourlyChart.innerHTML = relevantHours
-    .map(
-      (h) => `
-    <div class="hourly-item">
-      <span class="hourly-time">${formatTime(h.h, 0)}</span>
-      <span class="hourly-temp">${h.t}°</span>
-      <span class="hourly-feels">Feels ${h.fl}°</span>
-      ${
-        h.pc > 0
-          ? `
-        <span class="hourly-precip">
-          <svg viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
-          </svg>
-          ${h.pc}%
-        </span>
-      `
-          : ""
-      }
-      <span class="hourly-wind">${h.w} mph</span>
-    </div>
-  `,
-    )
+  // Check if current time is within ride window
+  if (currentTime < rideStartTime || currentTime > rideEndTime) {
+    positionMarker.setOpacity(0);
+    return;
+  }
+
+  // Calculate progress through the ride (0 to 1)
+  const rideDuration = rideEndTime - rideStartTime;
+  const progress = (currentTime - rideStartTime) / rideDuration;
+
+  // Find position along the route
+  const totalPoints = routeCoordinates.length;
+  const exactIndex = progress * (totalPoints - 1);
+  const lowerIndex = Math.floor(exactIndex);
+  const upperIndex = Math.min(lowerIndex + 1, totalPoints - 1);
+  const fraction = exactIndex - lowerIndex;
+
+  // Interpolate between points
+  const lat =
+    routeCoordinates[lowerIndex][0] +
+    (routeCoordinates[upperIndex][0] - routeCoordinates[lowerIndex][0]) *
+      fraction;
+  const lng =
+    routeCoordinates[lowerIndex][1] +
+    (routeCoordinates[upperIndex][1] - routeCoordinates[lowerIndex][1]) *
+      fraction;
+
+  // Update marker
+  positionMarker.setLatLng([lat, lng]);
+  positionMarker.setOpacity(1);
+}
+
+// ===== Display Temperature Chart =====
+function displayTemperatureChart(hourlyData, ride) {
+  const chartSection = document.getElementById("temp-chart-section");
+  chartSection.classList.remove("hidden");
+
+  chartState.hourlyData = hourlyData;
+
+  // Wait for browser to layout the unhidden element before measuring
+  requestAnimationFrame(() => {
+    renderTemperatureChart(hourlyData, ride);
+  });
+}
+
+// ===== Render Temperature Chart (after layout) =====
+function renderTemperatureChart(hourlyData, ride) {
+  // Find min/max temps for scale with fixed 5 degree padding
+  const temps = hourlyData.map((h) => h.t);
+  const minTemp = Math.min(...temps);
+  const maxTemp = Math.max(...temps);
+  const yMin = minTemp - 5;
+  const yMax = maxTemp + 5;
+
+  // Update Y axis labels
+  const yAxis = document.getElementById("chart-y-axis");
+  yAxis.innerHTML = `
+    <span>${yMax}°</span>
+    <span>${Math.round((yMax + yMin) / 2)}°</span>
+    <span>${yMin}°</span>
+  `;
+
+  // Chart dimensions - fill container width
+  const chartScroll = document.getElementById("chart-scroll");
+  const containerWidth = chartScroll.clientWidth;
+  const chartHeight = 100;
+
+  // Calculate hourWidth to fill the container
+  // chartWidth = (n-1) * hourWidth, so hourWidth = containerWidth / (n-1)
+  const hourWidth = containerWidth / (hourlyData.length - 1);
+  const chartWidth = containerWidth;
+
+  const chartInner = document.getElementById("chart-inner");
+  chartInner.style.width = `${chartWidth}px`;
+
+  const svg = document.getElementById("temp-chart-svg");
+  svg.setAttribute("viewBox", `0 0 ${chartWidth} ${chartHeight}`);
+  svg.setAttribute("width", chartWidth);
+  svg.setAttribute("height", chartHeight);
+
+  // Build points array - points at 0, hourWidth, 2*hourWidth, etc.
+  const points = hourlyData.map((h, i) => ({
+    x: i * hourWidth,
+    y: chartHeight - ((h.t - yMin) / (yMax - yMin)) * chartHeight,
+    data: h,
+    index: i,
+  }));
+
+  // Store chart scale info for indicator positioning
+  chartState.points = points;
+  chartState.hourWidth = hourWidth;
+  chartState.chartHeight = chartHeight;
+  chartState.yMin = yMin;
+  chartState.yMax = yMax;
+
+  // Generate smooth curve using Catmull-Rom to Bezier conversion
+  const linePath = generateSmoothPath(points, false);
+  const areaPath = generateSmoothPath(points, true, chartHeight);
+
+  document.getElementById("temp-line").setAttribute("d", linePath);
+  document.getElementById("temp-area").setAttribute("d", areaPath);
+
+  // Find ride time range in hourly data
+  // Calculate position based on actual time values including minutes
+  const firstHour = hourlyData[0].h;
+  const rideStartTime = ride.h + (ride.m || 0) / 60; // e.g., 6:30 = 6.5
+  const rideEndTime = rideStartTime + ride.d / 60; // duration in hours
+
+  // Calculate pixel positions based on time offset from first hour
+  const highlightStartX = (rideStartTime - firstHour) * hourWidth;
+  const highlightEndX = (rideEndTime - firstHour) * hourWidth;
+  const highlightWidth = highlightEndX - highlightStartX;
+
+  // Draw ride highlight (green with transparency and outline)
+  if (highlightWidth > 0) {
+    const cornerRadius = 8;
+
+    // Fill
+    const highlight = document.getElementById("ride-highlight");
+    highlight.setAttribute("x", highlightStartX);
+    highlight.setAttribute("y", 0);
+    highlight.setAttribute("width", highlightWidth);
+    highlight.setAttribute("height", chartHeight);
+    highlight.setAttribute("rx", cornerRadius);
+    highlight.setAttribute("ry", cornerRadius);
+
+    // Outline
+    const outline = document.getElementById("ride-outline");
+    outline.setAttribute("x", highlightStartX);
+    outline.setAttribute("y", 0);
+    outline.setAttribute("width", highlightWidth);
+    outline.setAttribute("height", chartHeight);
+    outline.setAttribute("rx", cornerRadius);
+    outline.setAttribute("ry", cornerRadius);
+  }
+
+  // X axis labels
+  const xAxis = document.getElementById("chart-x-axis");
+  xAxis.innerHTML = hourlyData
+    .map((h, i) => {
+      const x = i * hourWidth;
+      return `<span class="x-label" style="left: ${x}px">${formatHourShort(h.h)}</span>`;
+    })
     .join("");
+
+  // Position indicator at first point
+  const indicator = document.getElementById("position-indicator");
+  const firstPointY = points[0].y;
+  indicator.style.left = `0px`;
+  indicator.style.top = `${firstPointY}px`;
+  indicator.style.setProperty(
+    "--line-height",
+    `${chartHeight - firstPointY}px`,
+  );
+
+  // Update current display
+  updateChartDisplay(hourlyData[0], 0);
+
+  // Click interaction (desktop)
+  chartInner.addEventListener("click", (e) => {
+    handleChartTap(e, hourlyData, hourWidth, indicator);
+  });
+
+  // Touch drag interaction (mobile)
+  let isDragging = false;
+
+  chartInner.addEventListener(
+    "touchstart",
+    (e) => {
+      isDragging = true;
+      handleChartTap(e.touches[0], hourlyData, hourWidth, indicator);
+      e.preventDefault(); // Prevent scrolling while dragging on chart
+    },
+    { passive: false },
+  );
+
+  chartInner.addEventListener(
+    "touchmove",
+    (e) => {
+      if (isDragging) {
+        handleChartTap(e.touches[0], hourlyData, hourWidth, indicator);
+        e.preventDefault();
+      }
+    },
+    { passive: false },
+  );
+
+  chartInner.addEventListener("touchend", () => {
+    isDragging = false;
+  });
+
+  chartInner.addEventListener("touchcancel", () => {
+    isDragging = false;
+  });
+}
+
+// ===== Generate Smooth Path using Catmull-Rom Spline =====
+function generateSmoothPath(points, isArea, chartHeight) {
+  if (points.length < 2) return "";
+
+  let path = "";
+
+  // For area, start from bottom
+  if (isArea) {
+    path = `M ${points[0].x} ${chartHeight} L ${points[0].x} ${points[0].y}`;
+  } else {
+    path = `M ${points[0].x} ${points[0].y}`;
+  }
+
+  // Use monotone cubic interpolation for smooth curves
+  for (let i = 0; i < points.length - 1; i++) {
+    const p0 = points[Math.max(0, i - 1)];
+    const p1 = points[i];
+    const p2 = points[i + 1];
+    const p3 = points[Math.min(points.length - 1, i + 2)];
+
+    // Calculate control points using Catmull-Rom to Bezier conversion
+    const tension = 0.3;
+    const cp1x = p1.x + (p2.x - p0.x) * tension;
+    const cp1y = p1.y + (p2.y - p0.y) * tension;
+    const cp2x = p2.x - (p3.x - p1.x) * tension;
+    const cp2y = p2.y - (p3.y - p1.y) * tension;
+
+    path += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${p2.x} ${p2.y}`;
+  }
+
+  // For area, close the path
+  if (isArea) {
+    path += ` L ${points[points.length - 1].x} ${chartHeight} Z`;
+  }
+
+  return path;
+}
+
+// ===== Interpolate weather data between hours =====
+function interpolateWeather(hourlyData, position, hourWidth) {
+  // Position is in pixels, convert to fractional hour index
+  // Points are at: 0, hourWidth, 2*hourWidth, etc.
+  const fractionalIndex = position / hourWidth;
+  const clampedFraction = Math.max(
+    0,
+    Math.min(hourlyData.length - 1, fractionalIndex),
+  );
+
+  const lowerIndex = Math.floor(clampedFraction);
+  const upperIndex = Math.min(lowerIndex + 1, hourlyData.length - 1);
+  const fraction = clampedFraction - lowerIndex;
+
+  const lower = hourlyData[lowerIndex];
+  const upper = hourlyData[upperIndex];
+
+  // Interpolate numeric values
+  const tExact = lower.t + (upper.t - lower.t) * fraction;
+  const interpolated = {
+    h: lower.h + fraction, // Fractional hour
+    t: Math.round(tExact),
+    tExact: tExact, // Keep unrounded for Y position calculation
+    fl: Math.round(lower.fl + (upper.fl - lower.fl) * fraction),
+    w: Math.round(lower.w + (upper.w - lower.w) * fraction),
+    pc: Math.round(lower.pc + (upper.pc - lower.pc) * fraction),
+  };
+
+  return interpolated;
+}
+
+// ===== Format fractional hour =====
+function formatFractionalHour(fractionalHour) {
+  const hour = Math.floor(fractionalHour);
+  const minutes = Math.round((fractionalHour - hour) * 60);
+  const h = ((hour % 24) + 24) % 24;
+  const ampm = h >= 12 ? "pm" : "am";
+  const displayHour = h % 12 || 12;
+
+  if (minutes === 0) {
+    return `${displayHour}${ampm}`;
+  }
+  return `${displayHour}:${minutes.toString().padStart(2, "0")}${ampm}`;
+}
+
+// ===== Handle Chart Tap =====
+function handleChartTap(e, hourlyData, hourWidth, indicator) {
+  const chartInner = document.getElementById("chart-inner");
+  const rect = chartInner.getBoundingClientRect();
+  const tapX = (e.clientX || e.pageX) - rect.left;
+
+  // Clamp tap position to valid range
+  const minX = 0;
+  const maxX = (hourlyData.length - 1) * hourWidth;
+  const clampedTapX = Math.max(minX, Math.min(maxX, tapX));
+
+  // Interpolate weather at tapped position
+  const interpolated = interpolateWeather(hourlyData, clampedTapX, hourWidth);
+
+  // Calculate Y position based on exact interpolated temperature
+  const { yMin, yMax, chartHeight } = chartState;
+  const yPos =
+    chartHeight - ((interpolated.tExact - yMin) / (yMax - yMin)) * chartHeight;
+
+  // Update indicator position (both X and Y)
+  indicator.style.left = `${clampedTapX}px`;
+  indicator.style.top = `${yPos}px`;
+  // Set line height to reach the bottom of the chart (x-axis)
+  indicator.style.setProperty("--line-height", `${chartHeight - yPos}px`);
+
+  // Update display with interpolated values
+  updateChartDisplayInterpolated(interpolated);
+
+  // Update map overlay with interpolated values
+  updateMapOverlayInterpolated(interpolated);
+}
+
+// ===== Update Chart Display with Interpolated Data =====
+function updateChartDisplayInterpolated(data) {
+  document.getElementById("chart-time").textContent = formatFractionalHour(
+    data.h,
+  );
+  document.getElementById("chart-temp").textContent = `${data.t}°`;
+
+  // Update map position marker
+  updateMapPositionMarker(data.h);
+}
+
+// ===== Update Map Overlay with Interpolated Data =====
+function updateMapOverlayInterpolated(data) {
+  document.getElementById("map-temp").textContent = `${data.t}°`;
+  document.getElementById("map-feels").textContent = `${data.fl}°`;
+  document.getElementById("map-wind").textContent = data.w;
+}
+
+// ===== Update Chart Display =====
+function updateChartDisplay(hourData, index) {
+  document.getElementById("chart-time").textContent = formatHourShort(
+    hourData.h,
+  );
+  document.getElementById("chart-temp").textContent = `${hourData.t}°`;
 }
 
 // ===== Utility Functions =====
 function formatTime(hour, minute) {
-  const h = hour % 24;
+  const h = ((hour % 24) + 24) % 24;
   const ampm = h >= 12 ? "PM" : "AM";
   const displayHour = h % 12 || 12;
   const displayMin = minute.toString().padStart(2, "0");
   return `${displayHour}:${displayMin} ${ampm}`;
 }
 
-function formatTimeString(timeStr) {
-  // Convert "07:15" to "7:15 AM"
-  const [h, m] = timeStr.split(":").map(Number);
-  return formatTime(h, m);
+// Parse time string like "7:15 AM", "5:45 PM", or "7:15" to decimal hours
+// For strings without AM/PM, isSunrise hint is used
+function parseTimeToDecimal(timeStr, isSunrise = true) {
+  if (!timeStr) return null;
+
+  // Try with AM/PM first
+  const matchAmPm = timeStr.match(/(\d+):(\d+)\s*(AM|PM|am|pm)/i);
+  if (matchAmPm) {
+    let hour = parseInt(matchAmPm[1], 10);
+    const minute = parseInt(matchAmPm[2], 10);
+    const ampm = matchAmPm[3].toUpperCase();
+
+    if (ampm === "PM" && hour !== 12) hour += 12;
+    if (ampm === "AM" && hour === 12) hour = 0;
+
+    return hour + minute / 60;
+  }
+
+  // Try without AM/PM (just "7:15")
+  const matchSimple = timeStr.match(/(\d+):(\d+)/);
+  if (matchSimple) {
+    let hour = parseInt(matchSimple[1], 10);
+    const minute = parseInt(matchSimple[2], 10);
+
+    // Assume sunrise times < 12 are AM, sunset times are PM if hour < 12
+    if (!isSunrise && hour < 12) {
+      hour += 12;
+    }
+
+    return hour + minute / 60;
+  }
+
+  return null;
+}
+
+function formatHourShort(hour) {
+  const h = ((hour % 24) + 24) % 24;
+  const ampm = h >= 12 ? "p" : "a";
+  const displayHour = h % 12 || 12;
+  return `${displayHour}${ampm}`;
 }
 
 function formatDuration(minutes) {

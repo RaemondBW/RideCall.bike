@@ -3,6 +3,11 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="theme-color" content="#000000" />
+        <meta
+            name="apple-mobile-web-app-status-bar-style"
+            content="black-translucent"
+        />
         <title>Shared Ride - Ride Call</title>
         <meta
             name="description"
@@ -24,9 +29,16 @@
         <!-- Pako for zlib decompression -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
 
-        <!-- Mapbox GL JS for route display -->
-        <link href="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css" rel="stylesheet" />
-        <script src="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js"></script>
+        <!-- Leaflet JS for route display -->
+        <link
+            rel="stylesheet"
+            href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+            crossorigin=""
+        />
+        <script
+            src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            crossorigin=""
+        ></script>
 
         <!-- Favicon -->
         <link rel="icon" type="image/png" href="../images/ride-plan-icon.png" />
@@ -62,14 +74,21 @@
             <!-- Error State -->
             <div id="error-state" class="state-container hidden">
                 <div class="error-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"/>
-                        <line x1="12" y1="8" x2="12" y2="12"/>
-                        <line x1="12" y1="16" x2="12.01" y2="16"/>
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="12" y1="8" x2="12" y2="12" />
+                        <line x1="12" y1="16" x2="12.01" y2="16" />
                     </svg>
                 </div>
                 <h2>Unable to Load Ride</h2>
-                <p id="error-message">The ride link appears to be invalid or corrupted.</p>
+                <p id="error-message">
+                    The ride link appears to be invalid or corrupted.
+                </p>
                 <a href="../" class="btn-secondary">Go to Homepage</a>
             </div>
 
@@ -79,145 +98,300 @@
                 <section class="ride-card">
                     <div class="ride-header">
                         <h1 id="ride-title">Morning Ride</h1>
-                        <div class="ride-schedule" id="ride-schedule">
-                            <span class="schedule-badge">Every Monday</span>
+                        <div class="ride-time-schedule">
+                            <span id="ride-time">6:30 AM</span>
+                            <span class="recurrence-icon" id="recurrence-icon">
+                                <svg
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                >
+                                    <path d="M17 1l4 4-4 4" />
+                                    <path d="M3 11V9a4 4 0 0 1 4-4h14" />
+                                    <path d="M7 23l-4-4 4-4" />
+                                    <path d="M21 13v2a4 4 0 0 1-4 4H3" />
+                                </svg>
+                            </span>
+                            <span id="ride-schedule">Thursday</span>
                         </div>
                     </div>
 
-                    <div class="ride-details">
-                        <div class="detail-item">
-                            <div class="detail-icon">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <circle cx="12" cy="12" r="10"/>
-                                    <path d="M12 6v6l4 2"/>
-                                </svg>
-                            </div>
-                            <div class="detail-content">
-                                <span class="detail-label">Ride Time</span>
-                                <span class="detail-value" id="ride-time">7:30 AM</span>
-                            </div>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <span class="stat-label">Duration</span>
+                            <span class="stat-value" id="ride-duration"
+                                >2h 8m</span
+                            >
                         </div>
-
-                        <div class="detail-item">
-                            <div class="detail-icon">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M12 2v20M2 12h20"/>
-                                </svg>
-                            </div>
-                            <div class="detail-content">
-                                <span class="detail-label">Duration</span>
-                                <span class="detail-value" id="ride-duration">1h 30m</span>
-                            </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Wake Up</span>
+                            <span class="stat-value" id="wake-time"
+                                >6:00 AM</span
+                            >
                         </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Prep + Commute</span>
+                            <span class="stat-value" id="prep-commute"
+                                >30 min</span
+                            >
+                        </div>
+                    </div>
 
-                        <div class="detail-item">
-                            <div class="detail-icon">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-                                    <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-                                </svg>
+                    <div class="route-info-row" id="route-info-row">
+                        <div class="stat-item">
+                            <span class="stat-label">Route</span>
+                            <span class="stat-value" id="route-name">-</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Distance</span>
+                            <span class="stat-value" id="route-distance"
+                                >-</span
+                            >
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Elevation</span>
+                            <span class="stat-value" id="route-elevation"
+                                >-</span
+                            >
+                        </div>
+                    </div>
+
+                    <div class="alarm-row">
+                        <div class="alarm-label">
+                            <span class="alarm-icon">⏰</span>
+                            <span>Weather-aware alarm</span>
+                        </div>
+                        <span class="alarm-time" id="alarm-time">6:00 AM</span>
+                    </div>
+                </section>
+
+                <!-- Map Section -->
+                <section id="map-section" class="map-section hidden">
+                    <div id="route-map" class="route-map">
+                        <div
+                            class="map-weather-overlay"
+                            id="map-weather-overlay"
+                        >
+                            <div class="temp-row">
+                                <span class="temp-item"
+                                    >🌡 <span id="map-temp">48°</span></span
+                                >
+                                <span class="temp-item"
+                                    >🌡️ Feels
+                                    <span id="map-feels">48°</span></span
+                                >
                             </div>
-                            <div class="detail-content">
-                                <span class="detail-label">Wake Up Time</span>
-                                <span class="detail-value" id="wake-time">6:45 AM</span>
+                            <div class="wind-row">
+                                <span>💨 <span id="map-wind">3</span> ↙</span>
                             </div>
                         </div>
                     </div>
                 </section>
 
-                <!-- Route Section -->
-                <section id="route-section" class="route-card hidden">
-                    <div class="section-title-bar">
-                        <h2>Route</h2>
-                        <span class="route-source" id="route-source">Strava Route</span>
+                <!-- Temperature Chart -->
+                <section id="temp-chart-section" class="chart-section hidden">
+                    <div class="chart-header">
+                        <span class="chart-title">Temperature</span>
+                        <span class="chart-current">
+                            <span class="time" id="chart-time">7:31am</span> ·
+                            <span class="value" id="chart-temp">48°</span>
+                        </span>
                     </div>
-
-                    <div class="route-info">
-                        <h3 id="route-name">Downtown Loop</h3>
-                        <div class="route-stats">
-                            <div class="stat">
-                                <span class="stat-value" id="route-distance">20 mi</span>
-                                <span class="stat-label">Distance</span>
-                            </div>
-                            <div class="stat">
-                                <span class="stat-value" id="route-elevation">1,148 ft</span>
-                                <span class="stat-label">Elevation</span>
+                    <div class="chart-container">
+                        <div class="chart-y-axis" id="chart-y-axis">
+                            <span>57°</span>
+                            <span>50°</span>
+                            <span>43°</span>
+                        </div>
+                        <div class="chart-scroll-container" id="chart-scroll">
+                            <div class="chart-inner" id="chart-inner">
+                                <svg
+                                    class="temp-chart-svg"
+                                    id="temp-chart-svg"
+                                    preserveAspectRatio="none"
+                                >
+                                    <defs>
+                                        <linearGradient
+                                            id="tempGradient"
+                                            x1="0%"
+                                            y1="0%"
+                                            x2="0%"
+                                            y2="100%"
+                                        >
+                                            <stop
+                                                offset="0%"
+                                                style="
+                                                    stop-color: #ffd60a;
+                                                    stop-opacity: 0.4;
+                                                "
+                                            />
+                                            <stop
+                                                offset="100%"
+                                                style="
+                                                    stop-color: #30d158;
+                                                    stop-opacity: 0.2;
+                                                "
+                                            />
+                                        </linearGradient>
+                                    </defs>
+                                    <rect
+                                        class="ride-time-highlight"
+                                        id="ride-highlight"
+                                    ></rect>
+                                    <rect
+                                        class="ride-time-outline"
+                                        id="ride-outline"
+                                    ></rect>
+                                    <path
+                                        class="temp-area"
+                                        id="temp-area"
+                                    ></path>
+                                    <path
+                                        class="temp-line"
+                                        id="temp-line"
+                                    ></path>
+                                </svg>
+                                <div
+                                    class="position-indicator"
+                                    id="position-indicator"
+                                ></div>
+                                <div class="ride-label" id="ride-label"></div>
+                                <div
+                                    class="chart-x-axis"
+                                    id="chart-x-axis"
+                                ></div>
                             </div>
                         </div>
                     </div>
-
-                    <div id="route-map" class="route-map"></div>
                 </section>
 
                 <!-- Weather Section -->
-                <section id="weather-section" class="weather-card hidden">
-                    <div class="section-title-bar">
-                        <h2>Weather</h2>
-                        <span class="weather-date" id="weather-date">Thu, Jan 30</span>
+                <section id="weather-section" class="weather-section hidden">
+                    <div class="weather-header">
+                        <span class="weather-title">Weather</span>
+                        <span class="weather-date" id="weather-date"
+                            >Thu, Jan 30</span
+                        >
                     </div>
 
                     <div class="weather-main">
                         <div class="weather-icon-large" id="weather-icon">
-                            <span class="weather-emoji"></span>
+                            <span class="weather-emoji">☀️</span>
                         </div>
-                        <div class="weather-temps">
-                            <span class="temp-high" id="temp-high">65</span>
-                            <span class="temp-divider">/</span>
-                            <span class="temp-low" id="temp-low">52</span>
-                            <span class="temp-unit">°F</span>
+                        <div class="weather-info">
+                            <div class="weather-temps">
+                                <span class="temp-high" id="temp-high">65</span>
+                                <span class="temp-divider">/</span>
+                                <span class="temp-low" id="temp-low">52</span>
+                                <span
+                                    style="
+                                        color: var(--dark-text-secondary);
+                                        font-size: 1rem;
+                                    "
+                                    >°F</span
+                                >
+                            </div>
+                            <div class="weather-desc" id="weather-desc">
+                                Partly Cloudy
+                            </div>
                         </div>
-                        <div class="weather-desc" id="weather-desc">Partly Cloudy</div>
                     </div>
 
                     <div class="weather-details">
                         <div class="weather-detail">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
+                            <svg
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                            >
+                                <path
+                                    d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"
+                                />
                             </svg>
-                            <span id="precip-chance">15%</span>
+                            <span
+                                class="weather-detail-value"
+                                id="precip-chance"
+                                >15%</span
+                            >
                             <span class="weather-detail-label">Rain</span>
                         </div>
                         <div class="weather-detail">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/>
+                            <svg
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                            >
+                                <path
+                                    d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"
+                                />
                             </svg>
-                            <span id="wind-speed">12 mph</span>
-                            <span id="wind-dir" class="weather-detail-label">NW</span>
+                            <span class="weather-detail-value"
+                                ><span id="wind-speed">12</span> mph
+                                <span id="wind-dir">NW</span></span
+                            >
+                            <span class="weather-detail-label">Wind</span>
                         </div>
-                        <div class="weather-detail sunrise-sunset">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M17 18a5 5 0 0 0-10 0"/>
-                                <line x1="12" y1="2" x2="12" y2="9"/>
-                                <line x1="4.22" y1="10.22" x2="5.64" y2="11.64"/>
-                                <line x1="1" y1="18" x2="3" y2="18"/>
-                                <line x1="21" y1="18" x2="23" y2="18"/>
-                                <line x1="18.36" y1="11.64" x2="19.78" y2="10.22"/>
+                        <div class="weather-detail" id="sun-detail">
+                            <svg
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                            >
+                                <path d="M17 18a5 5 0 0 0-10 0" />
+                                <line x1="12" y1="2" x2="12" y2="9" />
+                                <line
+                                    x1="4.22"
+                                    y1="10.22"
+                                    x2="5.64"
+                                    y2="11.64"
+                                />
+                                <line x1="1" y1="18" x2="3" y2="18" />
+                                <line x1="21" y1="18" x2="23" y2="18" />
+                                <line
+                                    x1="18.36"
+                                    y1="11.64"
+                                    x2="19.78"
+                                    y2="10.22"
+                                />
                             </svg>
-                            <span id="sunrise">7:15</span>
-                            <span class="sun-divider">-</span>
-                            <span id="sunset">5:45</span>
+                            <span class="weather-detail-value" id="sun-time"
+                                >7:15</span
+                            >
+                            <span class="weather-detail-label" id="sun-label"
+                                >Sunrise</span
+                            >
                         </div>
-                    </div>
-
-                    <!-- Hourly Weather Chart -->
-                    <div id="hourly-section" class="hourly-section hidden">
-                        <h3>During Your Ride</h3>
-                        <div class="hourly-chart" id="hourly-chart"></div>
                     </div>
                 </section>
 
                 <!-- Open in App CTA -->
                 <section class="app-cta">
-                    <div class="app-cta-content">
-                        <img src="../images/ride-plan-icon.png" alt="Ride Call" class="app-cta-icon" />
-                        <div class="app-cta-text">
-                            <h3>Open in Ride Call</h3>
-                            <p>View full details and add to your rides</p>
-                        </div>
+                    <img
+                        src="../images/ride-plan-icon.png"
+                        alt="Ride Call"
+                        class="app-cta-icon"
+                    />
+                    <div class="app-cta-text">
+                        <h3>Open in Ride Call</h3>
+                        <p>View full details and add to your rides</p>
                     </div>
-                    <a href="https://apps.apple.com/us/app/ride-call/id6756632074" class="app-store-btn" id="open-app-btn">
-                        <svg viewBox="0 0 24 24" fill="currentColor" class="apple-icon">
-                            <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+                    <a
+                        href="https://apps.apple.com/us/app/ride-call/id6756632074"
+                        class="app-store-btn"
+                        id="open-app-btn"
+                    >
+                        <svg
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                            class="apple-icon"
+                        >
+                            <path
+                                d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"
+                            />
                         </svg>
                         <div class="btn-text">
                             <span class="btn-label">Download on the</span>
@@ -263,7 +437,6 @@
         </footer>
 
         <!-- Scripts -->
-        <script src="../js/main.js"></script>
         <script src="ride.js"></script>
     </body>
 </html>

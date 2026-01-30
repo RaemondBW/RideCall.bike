@@ -1,10 +1,45 @@
-/* ===== Ride Page Styles ===== */
+/* ===== Ride Page Styles - Dark Theme ===== */
+
+/* Set body/html background for overscroll areas */
+html:has(.ride-page),
+body:has(.ride-page) {
+    background: #000000;
+}
+
+:root {
+    --dark-bg: #000000;
+    --dark-card: #1c1c1e;
+    --dark-card-secondary: #2c2c2e;
+    --dark-border: #38383a;
+    --dark-text: #ffffff;
+    --dark-text-secondary: #8e8e93;
+    --dark-text-tertiary: #636366;
+    --accent-blue: #0a84ff;
+    --accent-orange: #ff9f0a;
+    --accent-green: #30d158;
+    --accent-teal: #64d2ff;
+}
 
 .ride-page {
-    min-height: calc(100vh - 200px);
-    padding: 100px 24px 60px;
+    min-height: 100vh;
+    padding: 80px 0 40px;
+    background: var(--dark-bg);
+}
+
+.ride-page .container {
     max-width: 600px;
     margin: 0 auto;
+    padding: 0 16px;
+}
+
+/* Override navbar for dark theme */
+body:has(.ride-page) .navbar {
+    background: rgba(0, 0, 0, 0.8);
+    border-bottom-color: var(--dark-border);
+}
+
+body:has(.ride-page) .nav-logo {
+    color: var(--dark-text);
 }
 
 /* ===== State Containers ===== */
@@ -16,6 +51,7 @@
     min-height: 400px;
     text-align: center;
     gap: 16px;
+    color: var(--dark-text);
 }
 
 .hidden {
@@ -26,8 +62,8 @@
 .loading-spinner {
     width: 48px;
     height: 48px;
-    border: 4px solid var(--color-border);
-    border-top-color: var(--color-primary);
+    border: 4px solid var(--dark-border);
+    border-top-color: var(--accent-blue);
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
@@ -42,7 +78,7 @@
 .error-icon {
     width: 64px;
     height: 64px;
-    color: #ef4444;
+    color: #ff453a;
 }
 
 .error-icon svg {
@@ -53,287 +89,434 @@
 #error-state h2 {
     font-size: 1.5rem;
     font-weight: 700;
-    color: var(--color-text);
+    color: var(--dark-text);
 }
 
 #error-state p {
-    color: var(--color-text-light);
+    color: var(--dark-text-secondary);
     max-width: 300px;
 }
 
 .btn-secondary {
     display: inline-block;
     padding: 12px 24px;
-    background: var(--color-bg-alt);
-    color: var(--color-text);
-    border-radius: var(--radius-md);
+    background: var(--dark-card);
+    color: var(--dark-text);
+    border-radius: 12px;
     font-weight: 600;
-    border: 1px solid var(--color-border);
-    transition: all var(--transition-fast);
+    border: 1px solid var(--dark-border);
+    transition: all 0.2s ease;
     margin-top: 16px;
 }
 
 .btn-secondary:hover {
-    background: var(--color-primary);
-    color: white;
-    border-color: var(--color-primary);
+    background: var(--accent-blue);
+    border-color: var(--accent-blue);
 }
 
 /* ===== Ride Card ===== */
 .ride-card {
-    background: white;
-    border-radius: var(--radius-xl);
-    padding: 32px;
-    box-shadow: var(--shadow-lg);
-    border: 1px solid var(--color-border);
-    margin-bottom: 24px;
+    background: var(--dark-card);
+    border-radius: 16px;
+    padding: 20px;
+    margin: 16px;
 }
 
 .ride-header {
-    margin-bottom: 24px;
-    padding-bottom: 24px;
-    border-bottom: 1px solid var(--color-border);
+    margin-bottom: 16px;
 }
 
 .ride-header h1 {
-    font-size: 1.75rem;
-    font-weight: 800;
-    color: var(--color-text);
-    margin-bottom: 8px;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent-teal);
+    margin-bottom: 4px;
     letter-spacing: -0.02em;
 }
 
-.ride-schedule {
+.ride-time-schedule {
     display: flex;
+    align-items: center;
     gap: 8px;
+    color: var(--dark-text-secondary);
+    font-size: 0.9375rem;
 }
 
-.schedule-badge {
+.ride-time-schedule .recurrence-icon {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    background: linear-gradient(135deg, #dbeafe 0%, #e0f2fe 100%);
-    color: var(--color-primary);
-    padding: 6px 12px;
-    border-radius: 100px;
+}
+
+.ride-time-schedule .recurrence-icon svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    padding: 16px 0;
+    border-top: 1px solid var(--dark-border);
+    border-bottom: 1px solid var(--dark-border);
+    margin-bottom: 16px;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    color: var(--dark-text-secondary);
+    text-transform: capitalize;
+}
+
+.stat-value {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--dark-text);
+}
+
+/* Route Info Row */
+.route-info-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--dark-border);
+    margin-bottom: 16px;
+}
+
+/* Alarm Row */
+.alarm-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.alarm-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--dark-text);
+    font-size: 0.9375rem;
+}
+
+.alarm-icon {
+    font-size: 1.25rem;
+}
+
+.alarm-time {
+    color: var(--dark-text-secondary);
+    font-size: 0.9375rem;
+}
+
+/* ===== Map Section ===== */
+.map-section {
+    margin: 16px;
+    border-radius: 16px;
+    overflow: hidden;
+    background: var(--dark-card);
+}
+
+.route-map {
+    height: 300px;
+    background: #1a1a2e;
+}
+
+/* Weather overlay on map */
+.map-weather-overlay {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: rgba(28, 28, 30, 0.9);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 10px;
+    padding: 10px 12px;
+    z-index: 1000;
+    font-size: 0.8125rem;
+    color: var(--dark-text);
+}
+
+.map-weather-overlay .temp-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 4px;
+}
+
+.map-weather-overlay .temp-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.map-weather-overlay .wind-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--dark-text-secondary);
+    font-size: 0.75rem;
+}
+
+/* Temperature markers on map */
+.temp-marker {
+    background: var(--accent-blue);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* ===== Temperature Chart Section ===== */
+.chart-section {
+    margin: 16px;
+    background: var(--dark-card);
+    border-radius: 16px;
+    padding: 16px;
+}
+
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.chart-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--dark-text);
+}
+
+.chart-current {
     font-size: 0.875rem;
+    color: var(--dark-text-secondary);
+}
+
+.chart-current .time {
+    color: var(--dark-text);
+}
+
+.chart-current .value {
+    color: var(--dark-text);
     font-weight: 600;
 }
 
-.ride-details {
+/* Chart Container */
+.chart-container {
+    position: relative;
+    height: 120px;
+}
+
+.chart-y-axis {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 20px;
+    width: 35px;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    justify-content: space-between;
+    font-size: 0.6875rem;
+    color: var(--dark-text-tertiary);
+    z-index: 2;
+    background: linear-gradient(to right, var(--dark-card) 80%, transparent);
+    padding-right: 8px;
 }
 
-.detail-item {
+.chart-scroll-container {
+    position: absolute;
+    left: 35px;
+    right: 0;
+    top: 0;
+    bottom: 0;
+}
+
+.chart-scroll-container::-webkit-scrollbar {
+    display: none;
+}
+
+.chart-inner {
+    position: relative;
+    height: calc(100% - 20px);
+    min-width: 100%;
+    overflow: visible;
+}
+
+/* SVG Chart */
+.temp-chart-svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+/* Ride time highlight - green with transparency */
+.ride-time-highlight {
+    fill: rgba(48, 209, 88, 0.2);
+}
+
+/* Ride time outline - solid green border */
+.ride-time-outline {
+    fill: none;
+    stroke: rgba(48, 209, 88, 0.8);
+    stroke-width: 1.5;
+}
+
+/* Temperature line */
+.temp-line {
+    fill: none;
+    stroke: #ffd60a;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* Temperature area gradient */
+.temp-area {
+    fill: url(#tempGradient);
+}
+
+/* Current position indicator (dot on the curve with line to x-axis) */
+.position-indicator {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: var(--accent-orange);
+    border: 2px solid white;
+    border-radius: 50%;
+    z-index: 3;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Line from indicator dot down to x-axis */
+.position-indicator::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    height: var(--line-height, 50px);
+    background: var(--accent-orange);
+    z-index: -1;
+}
+
+/* X-axis labels */
+.chart-x-axis {
+    position: absolute;
+    top: 100px;
+    left: 0;
+    right: 0;
+    height: 20px;
     display: flex;
-    align-items: center;
-    gap: 16px;
+    font-size: 0.6875rem;
+    color: var(--dark-text-tertiary);
 }
 
-.detail-icon {
-    width: 48px;
-    height: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--color-bg-alt);
-    border-radius: var(--radius-md);
-    flex-shrink: 0;
+.x-label {
+    position: absolute;
+    transform: translateX(-50%);
 }
 
-.detail-icon svg {
-    width: 24px;
-    height: 24px;
-    color: var(--color-primary);
-}
-
-.detail-content {
-    display: flex;
-    flex-direction: column;
-}
-
-.detail-label {
-    font-size: 0.8125rem;
-    color: var(--color-text-light);
+/* Ride label in chart */
+.ride-label {
+    position: absolute;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    font-size: 0.6875rem;
+    color: var(--accent-green);
+    opacity: 0.9;
     font-weight: 500;
 }
 
-.detail-value {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: var(--color-text);
+/* ===== Weather Section ===== */
+.weather-section {
+    margin: 16px;
+    background: var(--dark-card);
+    border-radius: 16px;
+    padding: 16px;
 }
 
-/* ===== Route Card ===== */
-.route-card {
-    background: white;
-    border-radius: var(--radius-xl);
-    padding: 24px;
-    box-shadow: var(--shadow-lg);
-    border: 1px solid var(--color-border);
-    margin-bottom: 24px;
-    overflow: hidden;
-}
-
-.section-title-bar {
+.weather-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 16px;
 }
 
-.section-title-bar h2 {
+.weather-title {
     font-size: 1.125rem;
-    font-weight: 700;
-    color: var(--color-text);
-}
-
-.route-source {
-    font-size: 0.75rem;
     font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: #fc4c02; /* Strava orange */
-    background: rgba(252, 76, 2, 0.1);
-    padding: 4px 10px;
-    border-radius: 100px;
-}
-
-.route-source.planned {
-    color: var(--color-secondary);
-    background: rgba(16, 185, 129, 0.1);
-}
-
-.route-info {
-    margin-bottom: 16px;
-}
-
-.route-info h3 {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: var(--color-text);
-    margin-bottom: 12px;
-}
-
-.route-stats {
-    display: flex;
-    gap: 32px;
-}
-
-.stat {
-    display: flex;
-    flex-direction: column;
-}
-
-.stat-value {
-    font-size: 1.5rem;
-    font-weight: 800;
-    color: var(--color-text);
-}
-
-.stat-label {
-    font-size: 0.8125rem;
-    color: var(--color-text-light);
-    font-weight: 500;
-}
-
-.route-map {
-    height: 200px;
-    background: var(--color-bg-alt);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-}
-
-.route-map .mapboxgl-canvas {
-    border-radius: var(--radius-lg);
-}
-
-/* Map placeholder when no polyline */
-.route-map.no-map {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--color-text-light);
-    font-size: 0.875rem;
-}
-
-/* ===== Weather Card ===== */
-.weather-card {
-    background: white;
-    border-radius: var(--radius-xl);
-    padding: 24px;
-    box-shadow: var(--shadow-lg);
-    border: 1px solid var(--color-border);
-    margin-bottom: 24px;
+    color: var(--dark-text);
 }
 
 .weather-date {
     font-size: 0.875rem;
-    color: var(--color-text-light);
-    font-weight: 500;
+    color: var(--dark-text-secondary);
 }
 
 .weather-main {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    padding: 24px 0;
-    border-bottom: 1px solid var(--color-border);
-    margin-bottom: 20px;
+    gap: 16px;
+    margin-bottom: 16px;
 }
 
 .weather-icon-large {
-    margin-bottom: 12px;
+    font-size: 3rem;
+    line-height: 1;
 }
 
-.weather-emoji {
-    font-size: 4rem;
-    line-height: 1;
+.weather-info {
+    flex: 1;
 }
 
 .weather-temps {
     display: flex;
     align-items: baseline;
     gap: 4px;
-    margin-bottom: 8px;
+    margin-bottom: 4px;
 }
 
 .temp-high {
-    font-size: 2.5rem;
-    font-weight: 800;
-    color: var(--color-text);
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--dark-text);
 }
 
 .temp-divider {
-    font-size: 1.5rem;
-    color: var(--color-text-light);
+    font-size: 1.25rem;
+    color: var(--dark-text-tertiary);
     margin: 0 4px;
 }
 
 .temp-low {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: var(--color-text-light);
-}
-
-.temp-unit {
-    font-size: 1rem;
-    color: var(--color-text-light);
-    margin-left: 2px;
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: var(--dark-text-secondary);
 }
 
 .weather-desc {
-    font-size: 1.125rem;
-    color: var(--color-text);
-    font-weight: 500;
+    font-size: 0.9375rem;
+    color: var(--dark-text-secondary);
 }
 
 .weather-details {
-    display: flex;
-    justify-content: space-around;
-    gap: 16px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    padding-top: 16px;
+    border-top: 1px solid var(--dark-border);
 }
 
 .weather-detail {
@@ -341,203 +524,143 @@
     flex-direction: column;
     align-items: center;
     gap: 4px;
-    flex: 1;
+    text-align: center;
 }
 
 .weather-detail svg {
-    width: 24px;
-    height: 24px;
-    color: var(--color-primary);
+    width: 20px;
+    height: 20px;
+    color: var(--accent-blue);
 }
 
-.weather-detail span {
+.weather-detail-value {
     font-size: 0.9375rem;
     font-weight: 600;
-    color: var(--color-text);
+    color: var(--dark-text);
 }
 
 .weather-detail-label {
-    font-size: 0.75rem !important;
-    color: var(--color-text-light) !important;
-    font-weight: 500 !important;
-}
-
-.sunrise-sunset {
-    flex-direction: row;
-    gap: 8px;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
-.sun-divider {
-    color: var(--color-text-light) !important;
-}
-
-/* ===== Hourly Weather ===== */
-.hourly-section {
-    margin-top: 24px;
-    padding-top: 24px;
-    border-top: 1px solid var(--color-border);
-}
-
-.hourly-section h3 {
-    font-size: 0.9375rem;
-    font-weight: 600;
-    color: var(--color-text);
-    margin-bottom: 16px;
-}
-
-.hourly-chart {
-    display: flex;
-    gap: 8px;
-    overflow-x: auto;
-    padding-bottom: 8px;
-    -webkit-overflow-scrolling: touch;
-}
-
-.hourly-chart::-webkit-scrollbar {
-    height: 4px;
-}
-
-.hourly-chart::-webkit-scrollbar-track {
-    background: var(--color-bg-alt);
-    border-radius: 2px;
-}
-
-.hourly-chart::-webkit-scrollbar-thumb {
-    background: var(--color-border);
-    border-radius: 2px;
-}
-
-.hourly-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    min-width: 60px;
-    padding: 12px 8px;
-    background: var(--color-bg-alt);
-    border-radius: var(--radius-md);
-}
-
-.hourly-time {
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--color-text-light);
-}
-
-.hourly-temp {
-    font-size: 1.125rem;
-    font-weight: 700;
-    color: var(--color-text);
-}
-
-.hourly-feels {
     font-size: 0.6875rem;
-    color: var(--color-text-light);
-}
-
-.hourly-precip {
-    display: flex;
-    align-items: center;
-    gap: 2px;
-    font-size: 0.75rem;
-    color: var(--color-primary);
-}
-
-.hourly-precip svg {
-    width: 12px;
-    height: 12px;
-}
-
-.hourly-wind {
-    font-size: 0.6875rem;
-    color: var(--color-text-light);
+    color: var(--dark-text-tertiary);
+    text-transform: uppercase;
 }
 
 /* ===== App CTA ===== */
 .app-cta {
-    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-    border-radius: var(--radius-xl);
-    padding: 24px;
+    margin: 16px;
+    background: linear-gradient(135deg, #1c1c1e 0%, #2c2c2e 100%);
+    border-radius: 16px;
+    padding: 20px;
     display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: 20px;
-    text-align: center;
-}
-
-.app-cta-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
+    gap: 16px;
 }
 
 .app-cta-icon {
-    width: 64px;
-    height: 64px;
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-lg);
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.app-cta-text {
+    flex: 1;
 }
 
 .app-cta-text h3 {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: white;
-    margin-bottom: 4px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--dark-text);
+    margin-bottom: 2px;
 }
 
 .app-cta-text p {
-    font-size: 0.875rem;
-    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.8125rem;
+    color: var(--dark-text-secondary);
 }
 
 .app-cta .app-store-btn {
-    width: 100%;
-    max-width: 240px;
-    justify-content: center;
+    background: var(--accent-blue);
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-size: 0.8125rem;
+}
+
+.app-cta .app-store-btn .btn-label {
+    font-size: 0.5625rem;
+}
+
+.app-cta .app-store-btn .btn-title {
+    font-size: 0.875rem;
+}
+
+.app-cta .apple-icon {
+    width: 20px;
+    height: 20px;
+}
+
+/* ===== Footer Override ===== */
+body:has(.ride-page) .footer {
+    background: var(--dark-bg);
+    border-top: 1px solid var(--dark-border);
 }
 
 /* ===== Responsive ===== */
 @media (max-width: 480px) {
     .ride-page {
-        padding: 88px 16px 40px;
+        padding-top: 70px;
     }
 
     .ride-card,
-    .route-card,
-    .weather-card {
-        padding: 20px;
-        border-radius: var(--radius-lg);
+    .map-section,
+    .chart-section,
+    .weather-section,
+    .app-cta {
+        margin: 12px;
+        border-radius: 12px;
     }
 
     .ride-header h1 {
-        font-size: 1.5rem;
-    }
-
-    .detail-value {
-        font-size: 1.125rem;
-    }
-
-    .weather-emoji {
-        font-size: 3rem;
-    }
-
-    .temp-high {
-        font-size: 2rem;
-    }
-
-    .temp-low {
         font-size: 1.25rem;
     }
 
-    .weather-details {
-        flex-wrap: wrap;
-        gap: 12px;
+    .stats-grid,
+    .route-info-row {
+        gap: 8px;
     }
 
-    .weather-detail {
-        min-width: calc(50% - 6px);
+    .stat-value {
+        font-size: 1rem;
     }
+
+    .route-map {
+        height: 250px;
+    }
+
+    .chart-container {
+        height: 100px;
+    }
+
+    .temp-high {
+        font-size: 1.75rem;
+    }
+}
+
+/* Leaflet overrides for dark theme */
+.route-map .leaflet-tile-pane {
+    filter: invert(1) hue-rotate(180deg) brightness(0.9) contrast(0.9);
+}
+
+.route-map .leaflet-container {
+    background: #1a1a2e;
+}
+
+/* Position marker on map */
+.position-marker {
+    width: 16px;
+    height: 16px;
+    background: var(--accent-orange);
+    border: 3px solid white;
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
 }
