@@ -3,7 +3,7 @@
     "apps": [],
     "details": [
       {
-        "appID": "TEAM_ID.com.raemond.ride-plan",
+        "appID": "G5JFC849XY.com.raemond.ride-plan",
         "paths": ["/r", "/r/*", "/r?*"]
       }
     ]
