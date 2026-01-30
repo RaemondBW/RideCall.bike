@@ -66,8 +66,8 @@ function decodeRideData(encodedData) {
     bytes[i] = binary.charCodeAt(i);
   }
 
-  // Decompress with zlib using pako
-  const decompressed = pako.inflate(bytes, { to: "string" });
+  // Decompress with raw deflate using pako (no zlib header)
+  const decompressed = pako.inflateRaw(bytes, { to: "string" });
 
   // Parse JSON
   return JSON.parse(decompressed);
@@ -117,9 +117,7 @@ function displayRideInfo(ride) {
   document.getElementById("ride-time").textContent = rideTime;
 
   // Duration
-  document.getElementById("ride-duration").textContent = formatDuration(
-    ride.d,
-  );
+  document.getElementById("ride-duration").textContent = formatDuration(ride.d);
 
   // Wake time calculation
   const totalMinutesBefore = (ride.p || 0) + (ride.c || 0);
@@ -294,8 +292,7 @@ function displayWeather(weather, ride) {
   // Date
   if (weather.dt) {
     const date = parseDate(weather.dt);
-    document.getElementById("weather-date").textContent =
-      formatDateShort(date);
+    document.getElementById("weather-date").textContent = formatDateShort(date);
   }
 
   // Weather icon
@@ -321,7 +318,9 @@ function displayWeather(weather, ride) {
     document.getElementById("sunrise").textContent = formatTimeString(
       weather.sr,
     );
-    document.getElementById("sunset").textContent = formatTimeString(weather.ss);
+    document.getElementById("sunset").textContent = formatTimeString(
+      weather.ss,
+    );
   } else {
     document.querySelector(".sunrise-sunset").style.display = "none";
   }
