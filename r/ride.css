@@ -27,9 +27,116 @@ body:has(.ride-page) {
 }
 
 .ride-page .container {
-    max-width: 600px;
+    max-width: 1200px;
     margin: 0 auto;
     padding: 0 16px;
+}
+
+/* Desktop two-column layout */
+@media (min-width: 768px) {
+    .ride-page .container {
+        padding: 0 32px;
+    }
+
+    #ride-content {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto auto auto;
+        gap: 24px;
+        align-items: start;
+    }
+
+    /* Ride card spans left column */
+    .ride-card {
+        grid-column: 1;
+        grid-row: 1;
+        margin: 0;
+    }
+
+    /* Map spans right column, both rows */
+    .map-section {
+        grid-column: 2;
+        grid-row: 1 / 3;
+        margin: 0;
+        height: 100%;
+        min-height: 400px;
+    }
+
+    .map-section .route-map {
+        height: 100%;
+        min-height: 400px;
+    }
+
+    /* Chart below ride card */
+    .chart-section {
+        grid-column: 1;
+        grid-row: 2;
+        margin: 0;
+    }
+
+    /* Weather spans full width */
+    .weather-section {
+        grid-column: 1 / -1;
+        grid-row: 3;
+        margin: 0;
+    }
+
+    /* App CTA spans full width */
+    .app-cta {
+        grid-column: 1 / -1;
+        grid-row: 4;
+        margin: 0;
+        max-width: 500px;
+        justify-self: center;
+        width: 100%;
+    }
+}
+
+/* Larger desktop refinements */
+@media (min-width: 1024px) {
+    .ride-page .container {
+        padding: 0 48px;
+    }
+
+    .ride-header h1 {
+        font-size: 2rem;
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+    }
+
+    .stats-grid {
+        gap: 24px;
+    }
+
+    .route-info-row {
+        gap: 24px;
+    }
+
+    .chart-container {
+        height: 150px;
+    }
+
+    .weather-main {
+        gap: 24px;
+    }
+
+    .weather-icon-large {
+        font-size: 4rem;
+    }
+
+    .temp-high {
+        font-size: 3rem;
+    }
+
+    .temp-low {
+        font-size: 1.75rem;
+    }
+
+    .weather-details {
+        gap: 32px;
+    }
 }
 
 /* Override navbar for dark theme */
