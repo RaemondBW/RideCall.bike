@@ -188,14 +188,14 @@ button {
     background: var(--gradient-hero);
     overflow: hidden;
     width: 100%;
-    gap: 40px;
 }
 
 .hero-inner {
     display: flex;
     align-items: center;
     justify-content: center;
-    max-width: 1400px;
+    gap: 60px;
+    max-width: 1200px;
     width: 100%;
     margin: 0 auto;
     z-index: 2;
@@ -203,7 +203,7 @@ button {
 
 .hero-content {
     flex: 1;
-    max-width: 600px;
+    max-width: 500px;
     z-index: 2;
 }
 
@@ -253,7 +253,7 @@ button {
 }
 
 .hero-visual {
-    flex: 1;
+    flex: 0 0 auto;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -421,7 +421,9 @@ button {
 
 .sticky-container {
     display: flex;
-    max-width: 1400px;
+    justify-content: center;
+    gap: 60px;
+    max-width: 1200px;
     margin: 0 auto;
 }
 
@@ -430,7 +432,7 @@ button {
     position: sticky;
     top: 100px;
     height: calc(100vh - 100px);
-    width: 50%;
+    flex: 0 0 auto;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -466,8 +468,9 @@ button {
 
 /* Feature Cards Container */
 .feature-cards-container {
-    width: 50%;
-    padding: 100px 60px 100px 40px;
+    flex: 1;
+    max-width: 500px;
+    padding: 100px 40px;
 }
 
 .feature-card-scroll {
