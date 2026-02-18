@@ -93,25 +93,27 @@ function initStickyPhoneFeatures() {
     return [desktopLottie, mobileLottie].filter(Boolean);
   };
 
-  // Start Lottie animation from beginning when card comes into focus
-  const startLottieAnimation = (card) => {
+  // Seek Lottie to a scroll progress (0-1)
+  const seekLottie = (card, progress) => {
     const players = getLottiePlayers(card);
-    players.forEach((lottie) => {
-      if (lottie && lottie.stop && lottie.play) {
-        lottie.stop();
-        lottie.play();
+    players.forEach((player) => {
+      if (!player) return;
+      const lottie = player.getLottie && player.getLottie();
+      if (lottie && lottie.totalFrames) {
+        const frame = Math.round(progress * (lottie.totalFrames - 1));
+        lottie.goToAndStop(frame, true);
       }
     });
   };
 
-  // Stop Lottie animation when card loses focus
-  const stopLottieAnimation = (card) => {
-    const players = getLottiePlayers(card);
-    players.forEach((lottie) => {
-      if (lottie && lottie.stop) {
-        lottie.stop();
-      }
-    });
+  // Calculate progress for a card: 0 when card center enters viewport, 1 when it leaves
+  const getCardProgress = (card) => {
+    const rect = card.getBoundingClientRect();
+    const windowHeight = window.innerHeight;
+    const cardCenter = rect.top + rect.height / 2;
+    // 0 when card center is at viewport bottom, 1 when card center is at viewport top
+    const progress = 1 - cardCenter / windowHeight;
+    return Math.max(0, Math.min(1, progress));
   };
 
   const createObserver = () => {
@@ -130,11 +132,6 @@ function initStickyPhoneFeatures() {
         if (entry.isIntersecting) {
           const screenNum = entry.target.getAttribute("data-screen");
 
-          // Stop animation on previous card
-          if (currentActiveCard && currentActiveCard !== entry.target) {
-            stopLottieAnimation(currentActiveCard);
-          }
-
           // Update active feature card
           featureCards.forEach((card) => card.classList.remove("active"));
           entry.target.classList.add("active");
@@ -147,14 +144,29 @@ function initStickyPhoneFeatures() {
             targetScreen.classList.add("active");
           }
 
-          // Start Lottie animation for the new active card
-          startLottieAnimation(entry.target);
+          // Immediately seek to current progress
+          seekLottie(entry.target, getCardProgress(entry.target));
         }
       });
     }, observerOptions);
 
     featureCards.forEach((card) => observer.observe(card));
   };
+
+  // Scroll handler - only seek the active card's Lottie
+  let ticking = false;
+  const onScroll = () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      if (currentActiveCard) {
+        seekLottie(currentActiveCard, getCardProgress(currentActiveCard));
+      }
+      ticking = false;
+    });
+  };
+
+  window.addEventListener("scroll", onScroll, { passive: true });
 
   // Create initial observer
   createObserver();
@@ -172,21 +184,10 @@ function initStickyPhoneFeatures() {
   if (featureCards.length > 0) {
     featureCards[0].classList.add("active");
     currentActiveCard = featureCards[0];
-
-    // Start animation when first card becomes visible
-    const visibilityObserver = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            startLottieAnimation(featureCards[0]);
-            visibilityObserver.disconnect();
-          }
-        });
-      },
-      { threshold: 0.1 },
-    );
-    visibilityObserver.observe(featureCards[0]);
   }
+
+  // Run once on load to set initial positions
+  onScroll();
 }
 
 // ===== Mobile Menu =====
