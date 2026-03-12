@@ -3,10 +3,11 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta name="theme-color" content="#000000" />
+        <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
+        <meta name="theme-color" content="#f2f2f7" media="(prefers-color-scheme: light)" />
         <meta
             name="apple-mobile-web-app-status-bar-style"
-            content="black-translucent"
+            content="default"
         />
         <title>Shared Ride - Ride Call</title>
         <meta
@@ -94,7 +95,33 @@
 
             <!-- Ride Content -->
             <div id="ride-content" class="hidden">
-                <!-- Ride Card -->
+                <!-- Map Section (top, full bleed) -->
+                <section id="map-section" class="map-section hidden">
+                    <div id="route-map" class="route-map">
+                        <div
+                            class="map-weather-overlay"
+                            id="map-weather-overlay"
+                        >
+                            <div class="location-row" id="map-location-row" style="display:none">
+                                <span id="map-location"></span>
+                            </div>
+                            <div class="temp-row">
+                                <span class="temp-item"
+                                    >🌡 <span id="map-temp">48°</span></span
+                                >
+                                <span class="temp-item"
+                                    >🌡️ Feels
+                                    <span id="map-feels">48°</span></span
+                                >
+                            </div>
+                            <div class="wind-row">
+                                <span>💨 <span id="map-wind">3</span> ↙</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Ride Card (overlaps map bottom) -->
                 <section class="ride-card">
                     <div class="ride-header">
                         <h1 id="ride-title">Morning Ride</h1>
@@ -144,36 +171,9 @@
                             >
                         </div>
                     </div>
-                </section>
 
-                <!-- Map Section -->
-                <section id="map-section" class="map-section hidden">
-                    <div id="route-map" class="route-map">
-                        <div
-                            class="map-weather-overlay"
-                            id="map-weather-overlay"
-                        >
-                            <div class="location-row" id="map-location-row" style="display:none">
-                                <span id="map-location"></span>
-                            </div>
-                            <div class="temp-row">
-                                <span class="temp-item"
-                                    >🌡 <span id="map-temp">48°</span></span
-                                >
-                                <span class="temp-item"
-                                    >🌡️ Feels
-                                    <span id="map-feels">48°</span></span
-                                >
-                            </div>
-                            <div class="wind-row">
-                                <span>💨 <span id="map-wind">3</span> ↙</span>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Temperature Chart -->
-                <section id="temp-chart-section" class="chart-section hidden">
+                    <!-- Temperature Chart -->
+                    <div id="temp-chart-section" class="chart-section hidden">
                     <div class="chart-header">
                         <span class="chart-title">Temperature</span>
                         <span class="chart-current">
@@ -247,109 +247,99 @@
                             </div>
                         </div>
                     </div>
-                </section>
 
-                <!-- Weather Section -->
-                <section id="weather-section" class="weather-section hidden">
-                    <div class="weather-header">
-                        <span class="weather-title">Weather</span>
-                        <span class="weather-date" id="weather-date"
-                            >Thu, Jan 30</span
-                        >
+                    <!-- Precipitation Chart -->
+                    <div id="precip-chart-section" class="chart-section hidden">
+                    <div class="chart-header">
+                        <span class="chart-title">Precipitation</span>
+                        <span class="chart-current">
+                            <span class="time" id="precip-chart-time"></span> ·
+                            <span class="value" id="precip-chart-value"></span>
+                        </span>
                     </div>
-
-                    <div class="weather-main">
-                        <div class="weather-icon-large" id="weather-icon">
-                            <span class="weather-emoji">☀️</span>
+                    <div class="chart-container">
+                        <div class="chart-y-axis" id="precip-y-axis">
+                            <span>Heavy</span>
+                            <span>Mod</span>
+                            <span>Light</span>
                         </div>
-                        <div class="weather-info">
-                            <div class="weather-temps">
-                                <span class="temp-high" id="temp-high">65</span>
-                                <span class="temp-divider">/</span>
-                                <span class="temp-low" id="temp-low">52</span>
-                                <span
-                                    style="
-                                        color: var(--dark-text-secondary);
-                                        font-size: 1rem;
-                                    "
-                                    >°F</span
+                        <div class="chart-scroll-container" id="precip-chart-scroll">
+                            <div class="chart-inner" id="precip-chart-inner">
+                                <svg
+                                    class="temp-chart-svg"
+                                    id="precip-chart-svg"
+                                    preserveAspectRatio="none"
                                 >
-                            </div>
-                            <div class="weather-desc" id="weather-desc">
-                                Partly Cloudy
+                                    <defs>
+                                        <linearGradient
+                                            id="precipGradient"
+                                            x1="0%"
+                                            y1="0%"
+                                            x2="0%"
+                                            y2="100%"
+                                        >
+                                            <stop
+                                                offset="0%"
+                                                style="
+                                                    stop-color: #0a84ff;
+                                                    stop-opacity: 0.4;
+                                                "
+                                            />
+                                            <stop
+                                                offset="100%"
+                                                style="
+                                                    stop-color: #30d158;
+                                                    stop-opacity: 0.15;
+                                                "
+                                            />
+                                        </linearGradient>
+                                    </defs>
+                                    <rect
+                                        class="ride-time-highlight"
+                                        id="precip-ride-highlight"
+                                    ></rect>
+                                    <rect
+                                        class="ride-time-outline"
+                                        id="precip-ride-outline"
+                                    ></rect>
+                                    <path
+                                        class="precip-area"
+                                        id="precip-area"
+                                    ></path>
+                                    <path
+                                        class="precip-line"
+                                        id="precip-line"
+                                    ></path>
+                                </svg>
+                                <div class="ride-label" id="precip-ride-label"></div>
+                                <div
+                                    class="chart-x-axis"
+                                    id="precip-x-axis"
+                                ></div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="weather-details">
-                        <div class="weather-detail">
-                            <svg
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="2"
-                            >
-                                <path
-                                    d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"
-                                />
-                            </svg>
-                            <span
-                                class="weather-detail-value"
-                                id="precip-chance"
-                                >15%</span
-                            >
-                            <span class="weather-detail-label">Rain</span>
-                        </div>
-                        <div class="weather-detail">
-                            <svg
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="2"
-                            >
-                                <path
-                                    d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"
-                                />
-                            </svg>
-                            <span class="weather-detail-value"
-                                ><span id="wind-speed">12</span> mph
-                                <span id="wind-dir">NW</span></span
-                            >
-                            <span class="weather-detail-label">Wind</span>
-                        </div>
-                        <div class="weather-detail" id="sun-detail">
-                            <svg
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="2"
-                            >
-                                <path d="M17 18a5 5 0 0 0-10 0" />
-                                <line x1="12" y1="2" x2="12" y2="9" />
-                                <line
-                                    x1="4.22"
-                                    y1="10.22"
-                                    x2="5.64"
-                                    y2="11.64"
-                                />
-                                <line x1="1" y1="18" x2="3" y2="18" />
-                                <line x1="21" y1="18" x2="23" y2="18" />
-                                <line
-                                    x1="18.36"
-                                    y1="11.64"
-                                    x2="19.78"
-                                    y2="10.22"
-                                />
-                            </svg>
-                            <span class="weather-detail-value" id="sun-time"
-                                >7:15</span
-                            >
-                            <span class="weather-detail-label" id="sun-label"
-                                >Sunrise</span
-                            >
-                        </div>
-                    </div>
+                    <!-- Chart hint -->
+                    <p id="chart-hint" class="chart-hint hidden">Drag on chart to see location on route</p>
                 </section>
+
+                <!-- Weather data targets (hidden, used by JS) -->
+                <div id="weather-section" style="display:none">
+                    <span id="weather-date"></span>
+                    <span id="temp-high"></span>
+                    <span id="temp-low"></span>
+                    <span class="temp-divider"></span>
+                    <span class="temp-low"></span>
+                    <span class="weather-emoji"></span>
+                    <span id="weather-desc"></span>
+                    <span id="precip-chance"></span>
+                    <span id="wind-speed"></span>
+                    <span id="wind-dir"></span>
+                    <span id="sun-time"></span>
+                    <span id="sun-label"></span>
+                    <span id="sun-detail"></span>
+                </div>
 
                 <!-- Open in App CTA -->
                 <section class="app-cta">
@@ -389,14 +379,6 @@
         <footer class="footer">
             <div class="container">
                 <div class="footer-content">
-                    <div class="footer-brand">
-                        <img
-                            src="../images/ride-plan-icon.png"
-                            alt="Ride Call"
-                            class="footer-icon"
-                        />
-                        <span class="footer-logo">Ride Call</span>
-                    </div>
                     <div class="footer-links">
                         <a
                             href="https://tally.so/r/kdGRY1"

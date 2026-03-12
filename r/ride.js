@@ -156,6 +156,7 @@ function displayRideData(data) {
         displayWeather(weather, data.r);
         if (weather.hr && weather.hr.length > 0) {
           displayTemperatureChart(weather.hr, data.r);
+          displayPrecipitationChart(weather.hr, data.r);
         }
       }
     })
@@ -166,6 +167,7 @@ function displayRideData(data) {
         displayWeather(data.w, data.r);
         if (data.w.hr && data.w.hr.length > 0) {
           displayTemperatureChart(data.w.hr, data.r);
+          displayPrecipitationChart(data.w.hr, data.r);
         }
       }
     });
@@ -251,8 +253,8 @@ function initMap(polyline) {
 
   chartState.map = map;
 
-  // Use CartoDB dark matter for dark theme
-  L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+  // Use CartoDB Voyager (light, clean style like Apple Maps)
+  L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
     maxZoom: 19,
   }).addTo(map);
 
@@ -280,7 +282,7 @@ function initMap(polyline) {
   const fitMap = () => {
     map.invalidateSize();
     map.fitBounds(routeLine.getBounds(), {
-      padding: [40, 40],
+      padding: [80, 60],
     });
   };
 
@@ -295,6 +297,34 @@ function initMap(polyline) {
     });
     ro.observe(mapContainer);
   }
+}
+
+// ===== Add Temperature Markers to Map =====
+function addTempMarkersToMap(sampledPoints, hourlyData, rideStartTime, rideEndTime) {
+  if (!chartState.map || !sampledPoints || sampledPoints.length === 0) return;
+
+  const map = chartState.map;
+
+  sampledPoints.forEach((pt, i) => {
+    // Find the temperature at ride start for each point
+    const progress = sampledPoints.length > 1 ? i / (sampledPoints.length - 1) : 0;
+    const timeAtPoint = rideStartTime + progress * (rideEndTime - rideStartTime);
+    const hourIndex = Math.round(timeAtPoint);
+
+    // Find temperature from the merged hourly data
+    const hourData = hourlyData.find((h) => h.h === Math.min(23, Math.max(0, hourIndex)));
+    const temp = hourData ? hourData.t : null;
+    if (temp === null) return;
+
+    const icon = L.divIcon({
+      className: "temp-marker",
+      html: `${temp}°`,
+      iconSize: null,
+      iconAnchor: [20, 12],
+    });
+
+    L.marker([pt[0], pt[1]], { icon: icon, interactive: false }).addTo(map);
+  });
 }
 
 // ===== Decode Google Polyline =====
@@ -482,8 +512,8 @@ async function fetchRouteWeather(route, ride) {
   const rideEndTime = rideStartTime + ride.d / 60;
 
   // We want a window of hours around the ride for the chart (2h before, 2h after)
-  const chartStartHour = Math.max(0, Math.floor(rideStartTime) - 2);
-  const chartEndHour = Math.min(23, Math.ceil(rideEndTime) + 2);
+  const chartStartHour = Math.max(0, Math.floor(rideStartTime) - 1);
+  const chartEndHour = Math.min(23, Math.ceil(rideEndTime) + 1);
 
   const mergedHourly = [];
   for (let hour = chartStartHour; hour <= chartEndHour; hour++) {
@@ -571,7 +601,6 @@ async function fetchRouteWeather(route, ride) {
 // ===== Display Weather =====
 function displayWeather(weather, ride) {
   const weatherSection = document.getElementById("weather-section");
-  weatherSection.classList.remove("hidden");
 
   // Date
   if (weather.dt) {
@@ -804,10 +833,10 @@ function renderTemperatureChart(hourlyData, ride) {
     <span>${yMin}°</span>
   `;
 
-  // Chart dimensions - fill container width
+  // Chart dimensions - fill container
   const chartScroll = document.getElementById("chart-scroll");
   const containerWidth = chartScroll.clientWidth;
-  const chartHeight = 100;
+  const chartHeight = chartScroll.clientHeight - 20; // leave room for x-axis
 
   // Calculate hourWidth to fill the container
   // chartWidth = (n-1) * hourWidth, so hourWidth = containerWidth / (n-1)
@@ -938,6 +967,95 @@ function renderTemperatureChart(hourlyData, ride) {
   });
 }
 
+// ===== Display Precipitation Chart =====
+function displayPrecipitationChart(hourlyData, ride) {
+  const chartSection = document.getElementById("precip-chart-section");
+  chartSection.classList.remove("hidden");
+
+  // Show chart hint
+  document.getElementById("chart-hint").classList.remove("hidden");
+
+  requestAnimationFrame(() => {
+    renderPrecipitationChart(hourlyData, ride);
+  });
+}
+
+function renderPrecipitationChart(hourlyData, ride) {
+  // Precip goes 0-100%, map to Heavy (100) / Mod (50) / Light (0)
+  const yMin = 0;
+  const yMax = 100;
+
+  const chartScroll = document.getElementById("precip-chart-scroll");
+  const chartHeight = chartScroll.clientHeight - 20; // leave room for x-axis
+  const containerWidth = chartScroll.clientWidth;
+  const hourWidth = containerWidth / (hourlyData.length - 1);
+  const chartWidth = containerWidth;
+
+  const chartInner = document.getElementById("precip-chart-inner");
+  chartInner.style.width = `${chartWidth}px`;
+
+  const svg = document.getElementById("precip-chart-svg");
+  svg.setAttribute("viewBox", `0 0 ${chartWidth} ${chartHeight}`);
+  svg.setAttribute("width", chartWidth);
+  svg.setAttribute("height", chartHeight);
+
+  // Build points
+  const points = hourlyData.map((h, i) => ({
+    x: i * hourWidth,
+    y: chartHeight - ((h.pc || 0) / yMax) * chartHeight,
+    data: h,
+  }));
+
+  const linePath = generateSmoothPath(points, false);
+  const areaPath = generateSmoothPath(points, true, chartHeight);
+
+  document.getElementById("precip-line").setAttribute("d", linePath);
+  document.getElementById("precip-area").setAttribute("d", areaPath);
+
+  // Ride highlight
+  const firstHour = hourlyData[0].h;
+  const rideStartTime = ride.h + (ride.m || 0) / 60;
+  const rideEndTime = rideStartTime + ride.d / 60;
+
+  const highlightStartX = (rideStartTime - firstHour) * hourWidth;
+  const highlightEndX = (rideEndTime - firstHour) * hourWidth;
+  const highlightWidth = highlightEndX - highlightStartX;
+
+  if (highlightWidth > 0) {
+    const cr = 8;
+    const rh = document.getElementById("precip-ride-highlight");
+    rh.setAttribute("x", highlightStartX);
+    rh.setAttribute("y", 0);
+    rh.setAttribute("width", highlightWidth);
+    rh.setAttribute("height", chartHeight);
+    rh.setAttribute("rx", cr);
+    rh.setAttribute("ry", cr);
+
+    const ro = document.getElementById("precip-ride-outline");
+    ro.setAttribute("x", highlightStartX);
+    ro.setAttribute("y", 0);
+    ro.setAttribute("width", highlightWidth);
+    ro.setAttribute("height", chartHeight);
+    ro.setAttribute("rx", cr);
+    ro.setAttribute("ry", cr);
+  }
+
+  // X axis
+  const xAxis = document.getElementById("precip-x-axis");
+  xAxis.innerHTML = hourlyData
+    .map((h, i) => {
+      const x = i * hourWidth;
+      return `<span class="x-label" style="left: ${x}px">${formatHourShort(h.h)}</span>`;
+    })
+    .join("");
+
+  // Set initial precip display
+  const startHourData = hourlyData.find((h) => h.h >= Math.floor(rideStartTime)) || hourlyData[0];
+  document.getElementById("precip-chart-time").textContent = formatHourShort(startHourData.h);
+  const precipLabel = startHourData.pc > 0 ? `${startHourData.pc}%` : "None";
+  document.getElementById("precip-chart-value").textContent = precipLabel;
+}
+
 // ===== Generate Smooth Path using Catmull-Rom Spline =====
 function generateSmoothPath(points, isArea, chartHeight) {
   if (points.length < 2) return "";
@@ -1060,6 +1178,14 @@ function updateChartDisplayInterpolated(data) {
     data.h,
   );
   document.getElementById("chart-temp").textContent = `${data.t}°`;
+
+  // Update precipitation chart display
+  const precipTime = document.getElementById("precip-chart-time");
+  const precipValue = document.getElementById("precip-chart-value");
+  if (precipTime && precipValue) {
+    precipTime.textContent = formatFractionalHour(data.h);
+    precipValue.textContent = data.pc > 0 ? `${data.pc}%` : "None";
+  }
 
   // Update map position marker
   updateMapPositionMarker(data.h);
