@@ -124,18 +124,6 @@
                                 >2h 8m</span
                             >
                         </div>
-                        <div class="stat-item">
-                            <span class="stat-label">Wake Up</span>
-                            <span class="stat-value" id="wake-time"
-                                >6:00 AM</span
-                            >
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-label">Prep + Commute</span>
-                            <span class="stat-value" id="prep-commute"
-                                >30 min</span
-                            >
-                        </div>
                     </div>
 
                     <div class="route-info-row" id="route-info-row">
@@ -156,14 +144,6 @@
                             >
                         </div>
                     </div>
-
-                    <div class="alarm-row">
-                        <div class="alarm-label">
-                            <span class="alarm-icon">⏰</span>
-                            <span>Weather-aware alarm</span>
-                        </div>
-                        <span class="alarm-time" id="alarm-time">6:00 AM</span>
-                    </div>
                 </section>
 
                 <!-- Map Section -->
@@ -173,6 +153,9 @@
                             class="map-weather-overlay"
                             id="map-weather-overlay"
                         >
+                            <div class="location-row" id="map-location-row" style="display:none">
+                                <span id="map-location"></span>
+                            </div>
                             <div class="temp-row">
                                 <span class="temp-item"
                                     >🌡 <span id="map-temp">48°</span></span

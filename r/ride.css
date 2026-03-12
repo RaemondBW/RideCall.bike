@@ -350,6 +350,12 @@ body:has(.ride-page) .nav-logo {
     color: var(--dark-text);
 }
 
+.map-weather-overlay .location-row {
+    font-weight: 600;
+    font-size: 0.875rem;
+    margin-bottom: 4px;
+}
+
 .map-weather-overlay .temp-row {
     display: flex;
     align-items: center;

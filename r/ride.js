@@ -91,9 +91,7 @@ function initRidePage() {
   try {
     const rideData = decodeRideData(encodedData);
     console.log("Decoded ride data:", rideData);
-    displayRideData(rideData).catch((error) => {
-      console.error("Error displaying ride data:", error);
-    });
+    displayRideData(rideData);
   } catch (error) {
     console.error("Error decoding ride data:", error);
     showError("Unable to decode the ride data. The link may be corrupted.");
@@ -125,9 +123,15 @@ function decodeRideData(encodedData) {
 }
 
 // ===== Display Ride Data =====
-async function displayRideData(data) {
+function displayRideData(data) {
+  // Validate required ride data
+  if (!data || !data.r || typeof data.r.h !== "number" || typeof data.r.d !== "number") {
+    showError("The ride data is incomplete or invalid.");
+    return;
+  }
+
   // Update page title
-  if (data.r && data.r.t) {
+  if (data.r.t) {
     document.title = `${data.r.t} - Ride Call`;
   }
 
@@ -141,29 +145,30 @@ async function displayRideData(data) {
     document.getElementById("route-info-row").style.display = "none";
   }
 
-  // Fetch live weather from Open-Meteo
-  try {
-    const weather = await fetchRouteWeather(data.rt, data.r);
-    if (weather) {
-      displayWeather(weather, data.r);
-      if (weather.hr && weather.hr.length > 0) {
-        displayTemperatureChart(weather.hr, data.r);
-      }
-    }
-  } catch (err) {
-    console.error("Failed to fetch live weather:", err);
-    // Fall back to cached weather if available
-    if (data.w) {
-      displayWeather(data.w, data.r);
-      if (data.w.hr && data.w.hr.length > 0) {
-        displayTemperatureChart(data.w.hr, data.r);
-      }
-    }
-  }
-
-  // Show content, hide loading
+  // Show content, hide loading immediately so map can render
   document.getElementById("loading-state").classList.add("hidden");
   document.getElementById("ride-content").classList.remove("hidden");
+
+  // Fetch live weather from Open-Meteo asynchronously
+  fetchRouteWeather(data.rt, data.r)
+    .then((weather) => {
+      if (weather) {
+        displayWeather(weather, data.r);
+        if (weather.hr && weather.hr.length > 0) {
+          displayTemperatureChart(weather.hr, data.r);
+        }
+      }
+    })
+    .catch((err) => {
+      console.error("Failed to fetch live weather:", err);
+      // Fall back to cached weather if available
+      if (data.w) {
+        displayWeather(data.w, data.r);
+        if (data.w.hr && data.w.hr.length > 0) {
+          displayTemperatureChart(data.w.hr, data.r);
+        }
+      }
+    });
 }
 
 // ===== Display Ride Info =====
@@ -189,24 +194,6 @@ function displayRideInfo(ride) {
 
   // Duration
   document.getElementById("ride-duration").textContent = formatDuration(ride.d);
-
-  // Wake time calculation
-  const totalMinutesBefore = (ride.p || 0) + (ride.c || 0);
-  const wakeMinutes = ride.h * 60 + ride.m - totalMinutesBefore;
-  const wakeHour = Math.floor(wakeMinutes / 60);
-  const wakeMin = wakeMinutes % 60;
-  document.getElementById("wake-time").textContent = formatTime(
-    wakeHour,
-    wakeMin,
-  );
-  document.getElementById("alarm-time").textContent = formatTime(
-    wakeHour,
-    wakeMin,
-  );
-
-  // Prep + Commute
-  document.getElementById("prep-commute").textContent =
-    `${totalMinutesBefore} min`;
 
   // Store for chart/map sync
   chartState.rideStartTime = ride.h + (ride.m || 0) / 60;
@@ -289,13 +276,25 @@ function initMap(polyline) {
     opacity: 0,
   }).addTo(map);
 
-  // Fit map to route bounds with a slight delay
-  setTimeout(() => {
+  // Fit map to route bounds once container is stable
+  const fitMap = () => {
     map.invalidateSize();
     map.fitBounds(routeLine.getBounds(), {
       padding: [40, 40],
     });
-  }, 100);
+  };
+
+  // Initial fit after brief layout delay
+  setTimeout(fitMap, 100);
+
+  // Re-fit whenever the map container resizes (e.g. weather/chart sections loading below)
+  if (typeof ResizeObserver !== "undefined") {
+    const mapContainer = document.getElementById("route-map");
+    const ro = new ResizeObserver(() => {
+      map.invalidateSize();
+    });
+    ro.observe(mapContainer);
+  }
 }
 
 // ===== Decode Google Polyline =====
@@ -393,6 +392,24 @@ function getRideDate(ride) {
   return target.toISOString().split("T")[0];
 }
 
+// Reverse-geocode a coordinate to a city/locality name
+async function reverseGeocode(lat, lon) {
+  try {
+    const url =
+      `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}` +
+      `&format=json&zoom=10&addressdetails=1`;
+    const res = await fetch(url, {
+      headers: { "User-Agent": "RideCall-Website/1.0" },
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    const addr = data.address;
+    return addr.city || addr.town || addr.village || addr.hamlet || addr.county || null;
+  } catch {
+    return null;
+  }
+}
+
 // Fetch hourly weather from Open-Meteo for a single point
 async function fetchPointWeather(lat, lon, date) {
   const url =
@@ -429,15 +446,20 @@ async function fetchRouteWeather(route, ride) {
 
   const date = getRideDate(ride);
 
-  // Fetch weather for all sampled points in parallel
-  const pointForecasts = await Promise.all(
-    sampledPoints.map((pt) => fetchPointWeather(pt[0], pt[1], date)),
-  );
+  // Fetch weather and city names for all sampled points in parallel
+  const [pointForecasts, pointCities] = await Promise.all([
+    Promise.all(sampledPoints.map((pt) => fetchPointWeather(pt[0], pt[1], date))),
+    Promise.all(sampledPoints.map((pt) => reverseGeocode(pt[0], pt[1]))),
+  ]);
 
   // Extract daily data from first point
   const daily = pointForecasts[0].daily;
   const sunriseRaw = daily.sunrise?.[0] || "";
   const sunsetRaw = daily.sunset?.[0] || "";
+
+  // Store sampled points and city names for chart/map interaction
+  chartState.sampledPoints = sampledPoints;
+  chartState.pointCities = pointCities;
 
   // Parse hourly arrays for each sampled point
   // Each forecast has .hourly.time[], .hourly.temperature_2m[], etc.
@@ -667,18 +689,48 @@ function displayWeather(weather, ride) {
   }
 }
 
+// ===== Get city name for a given time on the route =====
+function getCityForTime(currentTime) {
+  const { sampledPoints, pointCities, rideStartTime, rideEndTime } = chartState;
+  if (!sampledPoints || !pointCities || sampledPoints.length === 0) return null;
+  if (sampledPoints.length === 1) return pointCities[0];
+
+  let pointIndex = 0;
+  if (currentTime >= rideStartTime && currentTime <= rideEndTime) {
+    const progress = (currentTime - rideStartTime) / (rideEndTime - rideStartTime);
+    pointIndex = Math.round(Math.max(0, Math.min(1, progress)) * (sampledPoints.length - 1));
+  } else if (currentTime > rideEndTime) {
+    pointIndex = sampledPoints.length - 1;
+  }
+  return pointCities[pointIndex] || null;
+}
+
+// ===== Update map location display =====
+function updateMapLocation(cityName) {
+  const row = document.getElementById("map-location-row");
+  const el = document.getElementById("map-location");
+  if (cityName) {
+    el.textContent = cityName;
+    row.style.display = "";
+  } else {
+    row.style.display = "none";
+  }
+}
+
 // ===== Update Map Weather Overlay =====
 function updateMapOverlay(hourData) {
   document.getElementById("map-temp").textContent = `${hourData.t}°`;
   document.getElementById("map-feels").textContent = `${hourData.fl}°`;
   document.getElementById("map-wind").textContent = hourData.w;
-  // Update wind direction if available
   if (hourData.wd) {
     const windRow = document.querySelector(".wind-row span");
     if (windRow) {
       windRow.innerHTML = `💨 <span id="map-wind">${hourData.w}</span> ${hourData.wd}`;
     }
   }
+  // Show starting city
+  const city = getCityForTime(chartState.rideStartTime);
+  updateMapLocation(city);
 }
 
 // ===== Update Map Position Marker =====
@@ -1011,6 +1063,10 @@ function updateChartDisplayInterpolated(data) {
 
   // Update map position marker
   updateMapPositionMarker(data.h);
+
+  // Update city name based on position along route
+  const city = getCityForTime(data.h);
+  updateMapLocation(city);
 }
 
 // ===== Update Map Overlay with Interpolated Data =====
