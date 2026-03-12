@@ -19,6 +19,38 @@ const SF_SYMBOL_MAP = {
   "cloud.moon": "☁️🌙",
 };
 
+// ===== WMO Weather Code Mapping =====
+const WMO_CODE_MAP = {
+  0: { emoji: "☀️", desc: "Clear sky" },
+  1: { emoji: "🌤️", desc: "Mainly clear" },
+  2: { emoji: "⛅", desc: "Partly cloudy" },
+  3: { emoji: "☁️", desc: "Overcast" },
+  45: { emoji: "🌫️", desc: "Foggy" },
+  48: { emoji: "🌫️", desc: "Depositing rime fog" },
+  51: { emoji: "🌦️", desc: "Light drizzle" },
+  53: { emoji: "🌦️", desc: "Moderate drizzle" },
+  55: { emoji: "🌧️", desc: "Dense drizzle" },
+  56: { emoji: "🌧️", desc: "Freezing drizzle" },
+  57: { emoji: "🌧️", desc: "Heavy freezing drizzle" },
+  61: { emoji: "🌧️", desc: "Slight rain" },
+  63: { emoji: "🌧️", desc: "Moderate rain" },
+  65: { emoji: "🌧️", desc: "Heavy rain" },
+  66: { emoji: "🌧️", desc: "Freezing rain" },
+  67: { emoji: "🌧️", desc: "Heavy freezing rain" },
+  71: { emoji: "❄️", desc: "Slight snow" },
+  73: { emoji: "❄️", desc: "Moderate snow" },
+  75: { emoji: "❄️", desc: "Heavy snow" },
+  77: { emoji: "❄️", desc: "Snow grains" },
+  80: { emoji: "🌦️", desc: "Slight rain showers" },
+  81: { emoji: "🌧️", desc: "Moderate rain showers" },
+  82: { emoji: "🌧️", desc: "Violent rain showers" },
+  85: { emoji: "❄️", desc: "Slight snow showers" },
+  86: { emoji: "❄️", desc: "Heavy snow showers" },
+  95: { emoji: "⛈️", desc: "Thunderstorm" },
+  96: { emoji: "⛈️", desc: "Thunderstorm with slight hail" },
+  99: { emoji: "⛈️", desc: "Thunderstorm with heavy hail" },
+};
+
 // ===== Day Name Mapping =====
 const DAY_NAMES = {
   1: "Sunday",
@@ -59,7 +91,9 @@ function initRidePage() {
   try {
     const rideData = decodeRideData(encodedData);
     console.log("Decoded ride data:", rideData);
-    displayRideData(rideData);
+    displayRideData(rideData).catch((error) => {
+      console.error("Error displaying ride data:", error);
+    });
   } catch (error) {
     console.error("Error decoding ride data:", error);
     showError("Unable to decode the ride data. The link may be corrupted.");
@@ -91,7 +125,7 @@ function decodeRideData(encodedData) {
 }
 
 // ===== Display Ride Data =====
-function displayRideData(data) {
+async function displayRideData(data) {
   // Update page title
   if (data.r && data.r.t) {
     document.title = `${data.r.t} - Ride Call`;
@@ -107,11 +141,23 @@ function displayRideData(data) {
     document.getElementById("route-info-row").style.display = "none";
   }
 
-  // Display weather and chart if present
-  if (data.w) {
-    displayWeather(data.w, data.r);
-    if (data.w.hr && data.w.hr.length > 0) {
-      displayTemperatureChart(data.w.hr, data.r);
+  // Fetch live weather from Open-Meteo
+  try {
+    const weather = await fetchRouteWeather(data.rt, data.r);
+    if (weather) {
+      displayWeather(weather, data.r);
+      if (weather.hr && weather.hr.length > 0) {
+        displayTemperatureChart(weather.hr, data.r);
+      }
+    }
+  } catch (err) {
+    console.error("Failed to fetch live weather:", err);
+    // Fall back to cached weather if available
+    if (data.w) {
+      displayWeather(data.w, data.r);
+      if (data.w.hr && data.w.hr.length > 0) {
+        displayTemperatureChart(data.w.hr, data.r);
+      }
     }
   }
 
@@ -293,6 +339,213 @@ function decodePolyline(encoded) {
   return points;
 }
 
+// ===== Open-Meteo Route-Aware Weather =====
+
+// Haversine distance in km between two [lat, lng] points
+function haversineKm(a, b) {
+  const R = 6371;
+  const dLat = ((b[0] - a[0]) * Math.PI) / 180;
+  const dLon = ((b[1] - a[1]) * Math.PI) / 180;
+  const lat1 = (a[0] * Math.PI) / 180;
+  const lat2 = (b[0] * Math.PI) / 180;
+  const h =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+
+// Sample N evenly-spaced points from a coordinate array
+function samplePoints(coords, count) {
+  if (coords.length <= count) return coords.slice();
+  const points = [];
+  for (let i = 0; i < count; i++) {
+    const idx = Math.round((i / (count - 1)) * (coords.length - 1));
+    points.push(coords[idx]);
+  }
+  return points;
+}
+
+// Check if all points are within maxKm of the start
+function isShortLoop(coords, maxKm) {
+  const start = coords[0];
+  return coords.every((c) => haversineKm(start, c) <= maxKm);
+}
+
+// Convert wind direction degrees to compass string
+function degreesToCompass(deg) {
+  const dirs = [
+    "N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE",
+    "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW",
+  ];
+  return dirs[Math.round(deg / 22.5) % 16];
+}
+
+// Get the ride date: use ride.dt if set, otherwise compute next occurrence of ride.rec
+function getRideDate(ride) {
+  if (ride.dt) return ride.dt; // Already YYYY-MM-DD
+  // For recurring rides, find the next occurrence
+  const today = new Date();
+  const todayDay = today.getDay() + 1; // 1=Sun..7=Sat (match app convention)
+  let daysAhead = (ride.rec - todayDay + 7) % 7;
+  if (daysAhead === 0) daysAhead = 0; // Today if it matches
+  const target = new Date(today);
+  target.setDate(target.getDate() + daysAhead);
+  return target.toISOString().split("T")[0];
+}
+
+// Fetch hourly weather from Open-Meteo for a single point
+async function fetchPointWeather(lat, lon, date) {
+  const url =
+    `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
+    `&hourly=temperature_2m,apparent_temperature,precipitation_probability,wind_speed_10m,wind_direction_10m,weather_code` +
+    `&daily=sunrise,sunset` +
+    `&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=auto` +
+    `&start_date=${date}&end_date=${date}`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Open-Meteo error: ${res.status}`);
+  return res.json();
+}
+
+// Main: fetch weather along the route and merge into ride-hour data
+async function fetchRouteWeather(route, ride) {
+  let coords = [];
+  let sampledPoints = [];
+
+  if (route && route.pl) {
+    coords = decodePolyline(route.pl);
+  }
+
+  if (coords.length >= 2) {
+    if (isShortLoop(coords, 15)) {
+      // Short loop — single point is enough
+      sampledPoints = [coords[0]];
+    } else {
+      sampledPoints = samplePoints(coords, 5);
+    }
+  } else {
+    // No route — can't fetch weather
+    return null;
+  }
+
+  const date = getRideDate(ride);
+
+  // Fetch weather for all sampled points in parallel
+  const pointForecasts = await Promise.all(
+    sampledPoints.map((pt) => fetchPointWeather(pt[0], pt[1], date)),
+  );
+
+  // Extract daily data from first point
+  const daily = pointForecasts[0].daily;
+  const sunriseRaw = daily.sunrise?.[0] || "";
+  const sunsetRaw = daily.sunset?.[0] || "";
+
+  // Parse hourly arrays for each sampled point
+  // Each forecast has .hourly.time[], .hourly.temperature_2m[], etc.
+  const pointHourlies = pointForecasts.map((fc) => {
+    const h = fc.hourly;
+    return h.time.map((t, i) => ({
+      hour: new Date(t).getHours(),
+      temp: Math.round(h.temperature_2m[i]),
+      feelsLike: Math.round(h.apparent_temperature[i]),
+      precip: h.precipitation_probability[i] || 0,
+      wind: Math.round(h.wind_speed_10m[i]),
+      windDir: h.wind_direction_10m[i],
+      code: h.weather_code[i],
+    }));
+  });
+
+  // Build ride-hour merged weather
+  // For each hour, figure out where the rider is on the route, pick closest sampled point
+  const rideStartTime = ride.h + (ride.m || 0) / 60;
+  const rideEndTime = rideStartTime + ride.d / 60;
+
+  // We want a window of hours around the ride for the chart (2h before, 2h after)
+  const chartStartHour = Math.max(0, Math.floor(rideStartTime) - 2);
+  const chartEndHour = Math.min(23, Math.ceil(rideEndTime) + 2);
+
+  const mergedHourly = [];
+  for (let hour = chartStartHour; hour <= chartEndHour; hour++) {
+    // Determine rider position on route at this hour
+    let pointIndex = 0; // default: start point
+    if (hour >= rideStartTime && hour <= rideEndTime && sampledPoints.length > 1) {
+      const progress = (hour - rideStartTime) / (rideEndTime - rideStartTime);
+      const clampedProgress = Math.max(0, Math.min(1, progress));
+      // Find closest sampled point index
+      pointIndex = Math.round(clampedProgress * (sampledPoints.length - 1));
+    } else if (hour > rideEndTime && sampledPoints.length > 1) {
+      pointIndex = sampledPoints.length - 1; // end point
+    }
+
+    const hourData = pointHourlies[pointIndex].find((h) => h.hour === hour);
+    if (!hourData) continue;
+
+    mergedHourly.push({
+      h: hour,
+      t: hourData.temp,
+      fl: hourData.feelsLike,
+      pc: hourData.precip,
+      w: hourData.wind,
+      wd: degreesToCompass(hourData.windDir),
+      sym: null, // Not using SF symbols anymore
+      code: hourData.code,
+    });
+  }
+
+  // Determine dominant weather code during ride hours
+  const rideHours = mergedHourly.filter(
+    (h) => h.h >= Math.floor(rideStartTime) && h.h <= Math.ceil(rideEndTime),
+  );
+  const dominantCode =
+    rideHours.length > 0
+      ? rideHours.reduce((worst, h) => Math.max(worst, h.code), 0)
+      : mergedHourly[0]?.code || 0;
+  const wmoInfo = WMO_CODE_MAP[dominantCode] || WMO_CODE_MAP[0];
+
+  // Compute daily hi/lo from ride hours
+  const rideTemps = rideHours.map((h) => h.t);
+  const hi = rideTemps.length > 0 ? Math.max(...rideTemps) : mergedHourly[0]?.t || 0;
+  const lo = rideTemps.length > 0 ? Math.min(...rideTemps) : mergedHourly[0]?.t || 0;
+
+  // Average wind during ride
+  const avgWind =
+    rideHours.length > 0
+      ? Math.round(rideHours.reduce((s, h) => s + h.w, 0) / rideHours.length)
+      : 0;
+
+  // Max precip during ride
+  const maxPrecip =
+    rideHours.length > 0 ? Math.max(...rideHours.map((h) => h.pc)) : 0;
+
+  // Dominant wind direction during ride
+  const dominantWd = rideHours.length > 0 ? rideHours[Math.floor(rideHours.length / 2)].wd : "N";
+
+  // Format sunrise/sunset for display
+  const formatSunTime = (iso) => {
+    if (!iso) return "";
+    const d = new Date(iso);
+    const h = d.getHours();
+    const m = d.getMinutes();
+    const ampm = h >= 12 ? "PM" : "AM";
+    const dh = h % 12 || 12;
+    return `${dh}:${m.toString().padStart(2, "0")} ${ampm}`;
+  };
+
+  return {
+    dt: date,
+    hi: hi,
+    lo: lo,
+    pr: maxPrecip,
+    ws: avgWind,
+    wd: dominantWd,
+    desc: wmoInfo.desc,
+    emoji: wmoInfo.emoji,
+    code: dominantCode,
+    sr: formatSunTime(sunriseRaw),
+    ss: formatSunTime(sunsetRaw),
+    hr: mergedHourly,
+  };
+}
+
 // ===== Display Weather =====
 function displayWeather(weather, ride) {
   const weatherSection = document.getElementById("weather-section");
@@ -354,8 +607,10 @@ function displayWeather(weather, ride) {
     // Wind
     document.getElementById("wind-speed").textContent = avgWind;
 
-    // Use most common symbol from ride hours, or first one
-    if (rideWeather.symbols.length > 0) {
+    // Weather emoji: prefer Open-Meteo WMO code, then SF symbol, then default
+    if (weather.emoji) {
+      document.querySelector(".weather-emoji").textContent = weather.emoji;
+    } else if (rideWeather.symbols.length > 0) {
       const emoji = SF_SYMBOL_MAP[rideWeather.symbols[0]] || "🌤️";
       document.querySelector(".weather-emoji").textContent = emoji;
     }
@@ -366,8 +621,12 @@ function displayWeather(weather, ride) {
     document.getElementById("precip-chance").textContent = `${weather.pr}%`;
     document.getElementById("wind-speed").textContent = weather.ws;
 
-    const emoji = SF_SYMBOL_MAP[weather.sym] || "🌤️";
-    document.querySelector(".weather-emoji").textContent = emoji;
+    if (weather.emoji) {
+      document.querySelector(".weather-emoji").textContent = weather.emoji;
+    } else {
+      const emoji = SF_SYMBOL_MAP[weather.sym] || "🌤️";
+      document.querySelector(".weather-emoji").textContent = emoji;
+    }
   }
 
   // Description (use daily description)
@@ -413,6 +672,13 @@ function updateMapOverlay(hourData) {
   document.getElementById("map-temp").textContent = `${hourData.t}°`;
   document.getElementById("map-feels").textContent = `${hourData.fl}°`;
   document.getElementById("map-wind").textContent = hourData.w;
+  // Update wind direction if available
+  if (hourData.wd) {
+    const windRow = document.querySelector(".wind-row span");
+    if (windRow) {
+      windRow.innerHTML = `💨 <span id="map-wind">${hourData.w}</span> ${hourData.wd}`;
+    }
+  }
 }
 
 // ===== Update Map Position Marker =====
@@ -684,6 +950,7 @@ function interpolateWeather(hourlyData, position, hourWidth) {
     fl: Math.round(lower.fl + (upper.fl - lower.fl) * fraction),
     w: Math.round(lower.w + (upper.w - lower.w) * fraction),
     pc: Math.round(lower.pc + (upper.pc - lower.pc) * fraction),
+    wd: fraction < 0.5 ? lower.wd : upper.wd, // Use nearest hour's wind direction
   };
 
   return interpolated;
@@ -751,6 +1018,12 @@ function updateMapOverlayInterpolated(data) {
   document.getElementById("map-temp").textContent = `${data.t}°`;
   document.getElementById("map-feels").textContent = `${data.fl}°`;
   document.getElementById("map-wind").textContent = data.w;
+  if (data.wd) {
+    const windRow = document.querySelector(".wind-row span");
+    if (windRow) {
+      windRow.innerHTML = `💨 <span id="map-wind">${data.w}</span> ${data.wd}`;
+    }
+  }
 }
 
 // ===== Update Chart Display =====
