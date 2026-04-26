@@ -148,6 +148,22 @@ button {
     color: var(--color-text);
 }
 
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.nav-link {
+    font-weight: 500;
+    color: var(--color-text-light);
+    transition: color var(--transition-fast);
+}
+
+.nav-link:hover {
+    color: var(--color-text);
+}
+
 .nav-cta {
     background: var(--color-text);
     color: white !important;

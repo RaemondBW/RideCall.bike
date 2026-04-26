@@ -1,0 +1,471 @@
+/* ===== Regional Rides Pages — light/dark adaptive iOS-style ===== */
+
+:root {
+    --page-bg: #000000;
+    --card-bg: #1c1c1e;
+    --card-bg-secondary: #2c2c2e;
+    --border-color: #38383a;
+    --text-primary: #ffffff;
+    --text-secondary: #8e8e93;
+    --text-tertiary: #636366;
+    --accent-blue: #0a84ff;
+    --accent-orange: #ff9f0a;
+    --accent-green: #30d158;
+    --accent-yellow: #ffd60a;
+    --chip-bg: #2c2c2e;
+    --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+@media (prefers-color-scheme: light) {
+    :root {
+        --page-bg: #f2f2f7;
+        --card-bg: #ffffff;
+        --card-bg-secondary: #f2f2f7;
+        --border-color: #d1d1d6;
+        --text-primary: #000000;
+        --text-secondary: #6c6c70;
+        --text-tertiary: #8e8e93;
+        --accent-blue: #007aff;
+        --accent-orange: #ff9500;
+        --accent-green: #34c759;
+        --accent-yellow: #ffcc00;
+        --chip-bg: #efeff4;
+        --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.06);
+    }
+}
+
+html:has(.rides-page),
+body:has(.rides-page) {
+    background: var(--page-bg);
+}
+
+.rides-page {
+    min-height: 100vh;
+    padding-top: 84px;
+    padding-bottom: 64px;
+    background: var(--page-bg);
+    color: var(--text-primary);
+}
+
+body:has(.rides-page) .navbar {
+    background: var(--page-bg);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border-bottom-color: transparent;
+}
+body:has(.rides-page) .nav-logo {
+    color: var(--text-primary);
+}
+body:has(.rides-page) .nav-cta {
+    background: var(--accent-blue);
+}
+body:has(.rides-page) .footer {
+    background: var(--page-bg);
+    border-top: 1px solid var(--border-color);
+    color: var(--text-primary);
+}
+body:has(.rides-page) .footer-links a {
+    color: var(--text-secondary);
+}
+body:has(.rides-page) .footer-links a:hover {
+    color: var(--text-primary);
+}
+body:has(.rides-page) .footer-copyright {
+    color: var(--text-tertiary);
+}
+
+.rides-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 16px;
+}
+
+/* ===== Region Header ===== */
+.region-header {
+    padding: 16px 0 24px;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 24px;
+}
+
+.region-eyebrow {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--accent-blue);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 6px;
+}
+
+.region-eyebrow a {
+    color: inherit;
+}
+
+.region-title {
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-bottom: 6px;
+    color: var(--text-primary);
+}
+
+.region-tagline {
+    color: var(--text-secondary);
+    font-size: 1rem;
+}
+
+.region-meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 16px;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+.region-meta-row strong {
+    color: var(--text-primary);
+}
+
+/* ===== Week Grid ===== */
+.week-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+}
+
+@media (min-width: 900px) {
+    .week-grid {
+        grid-template-columns: repeat(7, 1fr);
+        gap: 12px;
+    }
+}
+
+.day-column {
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 0;
+}
+
+.day-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 4px 4px 8px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.day-name {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.day-date {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.day-empty {
+    color: var(--text-tertiary);
+    font-size: 0.8125rem;
+    padding: 12px 4px;
+    border: 1px dashed var(--border-color);
+    border-radius: 12px;
+    text-align: center;
+}
+
+/* ===== Ride Card ===== */
+.ride-card {
+    background: var(--card-bg);
+    border-radius: 14px;
+    padding: 14px;
+    box-shadow: var(--shadow-card);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    position: relative;
+}
+
+.ride-card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.ride-card-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+}
+
+.ride-card-time {
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+    margin-top: 2px;
+}
+
+.ride-card-vibe {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 4px 8px;
+    border-radius: 999px;
+    background: var(--chip-bg);
+    color: var(--text-primary);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.ride-card-route {
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+}
+
+.ride-card-route .route-name {
+    color: var(--text-primary);
+    font-weight: 600;
+    display: block;
+    margin-bottom: 2px;
+}
+
+.ride-card-stats {
+    display: flex;
+    gap: 12px;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+.ride-card-stats span {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+.ride-card-stats strong {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.ride-card-description {
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+    line-height: 1.45;
+}
+
+.ride-card-meet {
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
+}
+.ride-card-meet::before {
+    content: "📍 ";
+}
+
+/* ===== Weather Pill ===== */
+.weather-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    background: var(--card-bg-secondary);
+    font-size: 0.8125rem;
+    color: var(--text-primary);
+}
+.weather-pill .emoji {
+    font-size: 1rem;
+}
+.weather-pill .temp {
+    font-weight: 700;
+}
+.weather-pill .precip {
+    color: var(--accent-blue);
+    font-weight: 600;
+}
+.weather-pill .wind {
+    color: var(--text-secondary);
+}
+.weather-pill.loading {
+    color: var(--text-tertiary);
+}
+
+/* ===== Add to Ride Call Button ===== */
+.add-to-app {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    background: var(--accent-blue);
+    color: #ffffff !important;
+    font-weight: 600;
+    font-size: 0.875rem;
+    padding: 10px 12px;
+    border-radius: 10px;
+    text-align: center;
+    transition: filter 0.15s ease;
+    margin-top: 4px;
+}
+.add-to-app:hover {
+    filter: brightness(1.1);
+}
+.add-to-app svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* ===== App Footer CTA ===== */
+.app-cta {
+    margin: 32px auto 0;
+    max-width: 600px;
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: var(--shadow-card);
+}
+.app-cta-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+}
+.app-cta-text {
+    flex: 1;
+}
+.app-cta-text h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 2px;
+}
+.app-cta-text p {
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+}
+.app-cta .app-store-btn {
+    background: var(--accent-blue);
+    padding: 10px 16px;
+    border-radius: 10px;
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+.app-cta .app-store-btn .btn-label {
+    font-size: 0.5625rem;
+    display: block;
+    line-height: 1;
+}
+.app-cta .app-store-btn .btn-title {
+    font-size: 0.875rem;
+    display: block;
+    line-height: 1.1;
+    font-weight: 600;
+}
+.app-cta .apple-icon {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+}
+
+/* ===== Region Index Page ===== */
+.region-index-hero {
+    padding: 24px 0 32px;
+    text-align: center;
+}
+.region-index-hero h1 {
+    font-size: 2.25rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+}
+.region-index-hero p {
+    color: var(--text-secondary);
+    max-width: 540px;
+    margin: 0 auto;
+}
+
+.region-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin-top: 8px;
+}
+@media (min-width: 600px) {
+    .region-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+@media (min-width: 960px) {
+    .region-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.region-card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 20px;
+    color: var(--text-primary);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    box-shadow: var(--shadow-card);
+    transition: transform 0.15s ease;
+}
+.region-card:hover {
+    transform: translateY(-2px);
+}
+.region-card h3 {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+.region-card p {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    flex: 1;
+}
+.region-card .ride-count {
+    font-size: 0.8125rem;
+    color: var(--accent-blue);
+    font-weight: 600;
+}
+
+/* ===== Submit a Ride CTA ===== */
+.submit-ride-cta {
+    margin: 48px auto 0;
+    max-width: 600px;
+    text-align: center;
+    padding: 20px;
+    border: 1px dashed var(--border-color);
+    border-radius: 16px;
+}
+.submit-ride-cta h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+}
+.submit-ride-cta p {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    margin-bottom: 12px;
+}
+.submit-ride-cta a {
+    color: var(--accent-blue);
+    font-weight: 600;
+}
+
+@media (max-width: 480px) {
+    .region-title {
+        font-size: 1.625rem;
+    }
+    .region-index-hero h1 {
+        font-size: 1.75rem;
+    }
+}
