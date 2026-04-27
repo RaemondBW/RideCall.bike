@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
+        <meta name="theme-color" content="#f2f2f7" media="(prefers-color-scheme: light)" />
+        <title>Group Rides - Ride Call</title>
+        <meta
+            name="description"
+            content="Find weekly group rides near you. Meet locations, routes, and live weather — open any ride directly in Ride Call."
+        />
+
+        <!-- Fonts -->
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Pacifico&display=swap"
+            rel="stylesheet"
+        />
+
+        <!-- Styles -->
+        <link rel="stylesheet" href="../css/styles.css" />
+        <link rel="stylesheet" href="group-rides.css" />
+
+        <!-- Pako (raw deflate, used to encode ride payloads for r/?d=...) -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
+
+        <!-- Leaflet (for the mini-maps on each card) -->
+        <link
+            rel="stylesheet"
+            href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+            crossorigin=""
+        />
+        <script
+            src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            crossorigin=""
+        ></script>
+
+        <!-- Favicon -->
+        <link rel="icon" type="image/png" href="../images/ride-plan-icon.png" />
+    </head>
+    <body>
+        <!-- Navigation -->
+        <nav class="navbar">
+            <div class="nav-container">
+                <a href="../" class="nav-logo">
+                    <img
+                        src="../images/ride-plan-icon.png"
+                        alt="Ride Call"
+                        class="nav-icon"
+                    />
+                    <span>Ride Call</span>
+                </a>
+                <a
+                    href="https://apps.apple.com/us/app/ride-call/id6756632074"
+                    class="nav-cta"
+                    >Download</a
+                >
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="group-rides-page">
+            <!-- ===== Region picker (no ?r= in URL) ===== -->
+            <section id="picker-view">
+                <header class="group-rides-header">
+                    <span class="group-rides-eyebrow">Group Rides</span>
+                    <h1 class="group-rides-title">Pick a region</h1>
+                    <p class="group-rides-subtitle">
+                        Weekly group rides with meet locations, routes, and
+                        live weather. Tap any ride to open it in Ride Call.
+                    </p>
+                </header>
+
+                <!-- Populated from regions.json by group-rides.js. -->
+                <div class="regions-grid" id="regions-grid">
+                    <div class="rides-loading">
+                        <div class="rides-loading-spinner"></div>
+                        <p>Loading regions…</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== Listing view (?r=<slug> in URL) ===== -->
+            <section id="listing-view" hidden>
+                <header class="group-rides-header">
+                    <a href="./" class="back-link">← All regions</a>
+                    <span class="group-rides-eyebrow">Group Rides</span>
+                    <h1 class="group-rides-title" id="region-title">Region</h1>
+                    <p class="group-rides-subtitle" id="region-subtitle"></p>
+                </header>
+
+                <div id="rides-root">
+                    <div class="rides-loading">
+                        <div class="rides-loading-spinner"></div>
+                        <p>Loading rides…</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="container">
+                <div class="footer-content">
+                    <div class="footer-links">
+                        <a
+                            href="https://tally.so/r/kdGRY1"
+                            target="_blank"
+                            rel="noopener"
+                            >Support</a
+                        >
+                        <a href="../PrivacyPolicy.html">Privacy Policy</a>
+                        <a
+                            href="https://www.apple.com/legal/internet-services/itunes/dev/stdeula/"
+                            target="_blank"
+                            rel="noopener"
+                            >Terms of Use</a
+                        >
+                    </div>
+                    <p class="footer-copyright">
+                        &copy; 2025 Ride Call. All rights reserved.
+                    </p>
+                </div>
+            </div>
+        </footer>
+
+        <!-- Scripts -->
+        <script src="group-rides.js"></script>
+    </body>
+</html>

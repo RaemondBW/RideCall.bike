@@ -17,3 +17,6 @@ node_modules/
 # Build
 dist/
 build/
+
+# Internal admin tool — not for the public site
+/group-rides/admin/

@@ -62,6 +62,35 @@ const DAY_NAMES = {
   7: "Saturday",
 };
 
+// ===== Day-of-week Colors (matches the iOS app palette) =====
+const DAY_COLORS = {
+  1: { bg: "#264653", fg: "#ffffff" }, // Sunday
+  2: { bg: "#287271", fg: "#ffffff" }, // Monday
+  3: { bg: "#2A9D8F", fg: "#ffffff" }, // Tuesday
+  4: { bg: "#8AB17D", fg: "#ffffff" }, // Wednesday
+  5: { bg: "#E9C46A", fg: "#1f2937" }, // Thursday
+  6: { bg: "#F4A261", fg: "#1f2937" }, // Friday
+  7: { bg: "#E76F51", fg: "#ffffff" }, // Saturday
+};
+
+// Convert a ride to its day-of-week (1-7), preferring rec, falling back to dt.
+function rideDayOfWeek(ride) {
+  if (ride.rec) return ride.rec;
+  if (ride.dt) {
+    const d = parseDate(ride.dt);
+    if (!isNaN(d.getTime())) return d.getDay() + 1; // 1=Sun..7=Sat
+  }
+  return null;
+}
+
+function applyDayColor(ride) {
+  const dow = rideDayOfWeek(ride);
+  const color = DAY_COLORS[dow];
+  if (!color) return;
+  document.documentElement.style.setProperty("--day-color", color.bg);
+  document.documentElement.style.setProperty("--day-color-fg", color.fg);
+}
+
 // Global state for chart/map sync
 let chartState = {
   hourlyData: [],
@@ -175,6 +204,8 @@ function displayRideData(data) {
 
 // ===== Display Ride Info =====
 function displayRideInfo(ride) {
+  applyDayColor(ride);
+
   // Title
   document.getElementById("ride-title").textContent = ride.t;
 

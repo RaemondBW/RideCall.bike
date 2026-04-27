@@ -231,10 +231,23 @@ body:has(.ride-page) .nav-logo {
     margin: -32px 16px 0;
     position: relative;
     z-index: 10;
+    overflow: hidden;
+}
+
+/* Top accent strip — colored per day-of-week (set on :root by JS) */
+.ride-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: var(--day-color, #94a3b8);
 }
 
 .ride-header {
     margin-bottom: 10px;
+    padding-top: 4px;
 }
 
 .ride-header h1 {
@@ -261,6 +274,18 @@ body:has(.ride-page) .nav-logo {
 .ride-time-schedule .recurrence-icon svg {
     width: 16px;
     height: 16px;
+}
+
+/* Day name pill — colored per day-of-week */
+#ride-schedule {
+    display: inline-block;
+    background: var(--day-color, #94a3b8);
+    color: var(--day-color-fg, #ffffff);
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
 }
 
 /* Stats Grid */
@@ -385,15 +410,17 @@ body:has(.ride-page) .nav-logo {
     left: 0;
 }
 
-/* Ride time highlight - green with transparency */
+/* Ride time highlight — colored per day-of-week */
 .ride-time-highlight {
-    fill: rgba(48, 209, 88, 0.2);
+    fill: var(--day-color, #30d158);
+    fill-opacity: 0.2;
 }
 
-/* Ride time outline - solid green border */
+/* Ride time outline — colored per day-of-week */
 .ride-time-outline {
     fill: none;
-    stroke: rgba(48, 209, 88, 0.8);
+    stroke: var(--day-color, #30d158);
+    stroke-opacity: 0.8;
     stroke-width: 1.5;
 }
 
