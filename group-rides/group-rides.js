@@ -30,16 +30,28 @@ function rideDayOfWeek(ride) {
   return null;
 }
 
-const WMO_EMOJI = {
-  0: "☀️", 1: "🌤️", 2: "⛅", 3: "☁️",
-  45: "🌫️", 48: "🌫️",
-  51: "🌦️", 53: "🌦️", 55: "🌧️", 56: "🌧️", 57: "🌧️",
-  61: "🌧️", 63: "🌧️", 65: "🌧️", 66: "🌧️", 67: "🌧️",
-  71: "❄️", 73: "❄️", 75: "❄️", 77: "❄️",
-  80: "🌦️", 81: "🌧️", 82: "🌧️",
-  85: "❄️", 86: "❄️",
-  95: "⛈️", 96: "⛈️", 99: "⛈️",
-};
+// Map WMO weather codes to ammap icon files (../images/weather-icons/static).
+function weatherIconSrc(code) {
+  const base = "../images/weather-icons/static/";
+  if (code === 0) return base + "day.svg";
+  if (code === 1) return base + "cloudy-day-1.svg";
+  if (code === 2) return base + "cloudy-day-2.svg";
+  if (code === 3) return base + "cloudy.svg";
+  if (code === 45 || code === 48) return base + "cloudy.svg"; // no fog icon — use cloud
+  if (code === 51 || code === 53) return base + "rainy-1.svg";
+  if (code === 55 || code === 56 || code === 57) return base + "rainy-2.svg";
+  if (code === 61 || code === 63) return base + "rainy-3.svg";
+  if (code === 65) return base + "rainy-5.svg";
+  if (code === 66 || code === 67) return base + "rainy-6.svg";
+  if (code === 80 || code === 81) return base + "rainy-4.svg";
+  if (code === 82) return base + "rainy-7.svg";
+  if (code === 71 || code === 73) return base + "snowy-2.svg";
+  if (code === 75) return base + "snowy-4.svg";
+  if (code === 77) return base + "snowy-1.svg";
+  if (code === 85 || code === 86) return base + "snowy-3.svg";
+  if (code >= 95 && code <= 99) return base + "thunder.svg";
+  return base + "cloudy.svg";
+}
 
 document.addEventListener("DOMContentLoaded", () => {
   const params = new URLSearchParams(window.location.search);
@@ -374,15 +386,15 @@ async function fetchAndRenderRideWeather(cardEl, ride) {
     const avgWind = Math.round(winds.reduce((a, b) => a + b, 0) / winds.length);
     const dir = compassDirection(dirs[Math.floor(dirs.length / 2)]);
     const dominantCode = codes.reduce((m, c) => Math.max(m, c), 0);
-    const emoji = WMO_EMOJI[dominantCode] || "";
+    const iconSrc = weatherIconSrc(dominantCode);
     const maxPrecip = Math.max(...precips);
 
     const precipLine = maxPrecip >= 20
-      ? `<div class="ride-weather-item">☔ <span>${maxPrecip}%</span></div>`
+      ? `<div class="ride-weather-item">${maxPrecip}% rain</div>`
       : "";
 
     el.innerHTML = `
-      ${emoji ? `<div class="ride-weather-emoji">${emoji}</div>` : ""}
+      <img class="ride-weather-icon" src="${iconSrc}" alt="" />
       <div class="ride-weather-temp">${escapeHtml(tempStr)}</div>
       <div class="ride-weather-wind">${avgWind} mph ${dir}</div>
       ${precipLine}

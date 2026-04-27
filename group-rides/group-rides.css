@@ -229,10 +229,11 @@
     display: none;
 }
 
-.ride-card-weather .ride-weather-emoji {
-    font-size: 2.25rem;
-    line-height: 1;
-    margin-bottom: 4px;
+.ride-card-weather .ride-weather-icon {
+    width: 56px;
+    height: 56px;
+    margin-bottom: 2px;
+    display: block;
 }
 
 .ride-card-weather .ride-weather-temp {
