@@ -428,8 +428,8 @@ function nextOccurrenceDate(ride) {
 function buildRideLink(ride) {
   const payload = ridePayload(ride);
   const encoded = encodePayload(payload);
-  // Listing lives at /group-rides/, so /r/ is one level up.
-  return `../r/?d=${encoded}`;
+  // Absolute URL matches the iOS Universal Link pattern (no trailing slash).
+  return `https://ridecall.bike/r?d=${encoded}`;
 }
 
 function ridePayload(ride) {
